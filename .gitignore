@@ -1,0 +1,23 @@
+# Archivos temporales de Visual Studio
+.vs/
+**/.vs/
+
+# Archivos de compilación
+**/bin/
+**/obj/
+
+# Configuraciones personales
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Configuración local de desarrollo
+**/appsettings.Development.json
+
+# Archivos temporales
+*.tmp
+*.log
+
+# Paquetes descargados
+packages/
