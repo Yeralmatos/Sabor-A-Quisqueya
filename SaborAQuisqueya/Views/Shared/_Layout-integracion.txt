@@ -1,0 +1,14 @@
+En el <head> de Views/Shared/_Layout.cshtml agrega:
+<link rel="stylesheet" href="~/css/gestion-sabor.css" asp-append-version="true" />
+
+Dentro del <ul class="navbar-nav flex-grow-1"> agrega los siguientes elementos:
+<li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Registro">Registro</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Login">Iniciar sesión</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Perfil">Mi perfil</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Index">Gestión de usuarios (administrador)</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Reservas" asp-action="Crear">Reservar mesa</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Reservas" asp-action="MisReservas">Mis reservas</a></li>
+<li class="nav-item"><a class="nav-link" asp-controller="Reservas" asp-action="Administrar">Administrar reservas (administrador)</a></li>
+<li class="nav-item"><form asp-controller="Usuarios" asp-action="Logout" method="post" class="d-inline">@Html.AntiForgeryToken()<button type="submit" class="nav-link btn btn-link">Cerrar sesión</button></form></li>
+
+Los enlaces protegidos mostrarán una redirección a Login si el usuario no inició sesión. Las acciones de administrador exigen Rol = "Administrador".

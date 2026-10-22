@@ -1,0 +1,25 @@
+@{
+    ViewData["Title"] = "Iniciar sesión";
+    Layout = "_AuthLayout";
+}
+<div class="auth-shell">
+    <section class="auth-card">
+        <div class="auth-brand"><img src="~/images/logo-sabor-quisqueya.jpg" alt="Logo de Sabor a Quisqueya" /><span>Sabor a Quisqueya</span></div>
+        <p class="eyebrow">BIENVENIDO DE NUEVO</p>
+        <h1>¡Qué bueno verte!</h1>
+        <p class="muted">Accede para gestionar tus reservas.</p>
+        @if (TempData["Mensaje"] != null) { <div class="alert alert-success auth-message">@TempData["Mensaje"]</div> }
+        <div asp-validation-summary="All" class="validation"></div>
+        <form asp-action="Login" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <label>Correo electrónico<input name="correo" type="email" class="form-control" required autocomplete="email" placeholder="tu@correo.com" /></label>
+            <label>Contraseña<input name="contrasena" type="password" class="form-control" required autocomplete="current-password" placeholder="Tu contraseña" /></label>
+            <button class="btn-sq" type="submit">Iniciar sesión <span>→</span></button>
+        </form>
+        <p class="auth-footer">¿No tienes cuenta? <a asp-action="Registro">Regístrate aquí</a></p>
+    </section>
+    <aside class="auth-art">
+        <img class="auth-logo" src="~/images/logo-sabor-quisqueya.jpg" alt="Sabor a Quisqueya: cocina que nos une" />
+        <div class="auth-art-copy"><h2>El sabor de casa<br />te está esperando.</h2><p>Tradición dominicana en cada encuentro.</p></div>
+    </aside>
+</div>

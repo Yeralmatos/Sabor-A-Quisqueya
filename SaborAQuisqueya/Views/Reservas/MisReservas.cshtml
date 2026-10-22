@@ -1,0 +1,20 @@
+@model IEnumerable<SaborAQuisqueya.Models.Reserva>
+@{ ViewData["Title"] = "Mis reservas"; }
+<div class="page-wrap">
+    <div class="page-heading"><div><p class="eyebrow">TU EXPERIENCIA</p><h1>Mis reservas</h1><p class="muted">Consulta el estado de tus próximas visitas.</p></div><a asp-action="Crear" class="btn-sq">+ Nueva reserva</a></div>
+    @if (TempData["Mensaje"] != null) { <div class="alert alert-info">@TempData["Mensaje"]</div> }
+    @if (Model.Any()) {
+        <div class="reservation-list">
+        @foreach (var r in Model) {
+            var statusClass = r.Estado == "Aceptada" ? "status-green" : r.Estado == "Rechazada" || r.Estado == "Cancelada" ? "status-red" : "status-amber";
+            <article class="reservation-card">
+                <div class="reservation-date"><span>@r.FechaReserva.ToString("MMM").ToUpperInvariant()</span><strong>@r.FechaReserva.ToString("dd")</strong><small>@r.FechaReserva.ToString("yyyy")</small></div>
+                <div class="reservation-info"><h2>@(r.Restaurante?.Nombre ?? "Restaurante")</h2><p>◷ @DateTime.Today.Add(r.HoraReserva).ToString("hh:mm tt") <span>·</span> ♙ @r.CantidadPersonas @(r.CantidadPersonas == 1 ? "persona" : "personas")</p><small>Reserva #@r.Id @if (r.Mesa != null) { <text>· Mesa @r.Mesa.Numero</text> }</small></div>
+                <div class="reservation-actions"><span class="status @statusClass">@r.Estado</span>@if (r.Estado == "Pendiente" || r.Estado == "Aceptada") { <form asp-action="Cancelar" method="post" onsubmit="return confirm('¿Deseas cancelar esta reserva?');">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/><button class="btn-cancel" type="submit">Cancelar</button></form> }</div>
+            </article>
+        }
+        </div>
+    } else {
+        <section class="empty-state"><div class="empty-icon">⌁</div><h2>Aún no tienes reservas</h2><p>Cuando hagas una reserva, podrás consultar aquí su fecha y estado.</p><a asp-action="Crear" class="btn-sq">Reservar una mesa</a></section>
+    }
+</div>

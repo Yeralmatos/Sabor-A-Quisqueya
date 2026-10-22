@@ -1,0 +1,24 @@
+@using SaborAQuisqueya.Models
+@{ ViewData["Title"] = "Nueva reserva"; }
+<div class="page-wrap">
+    <div class="page-heading"><div><p class="eyebrow">RESERVACIONES</p><h1>Reserva tu mesa</h1><p class="muted">Completa los detalles y nosotros te ayudaremos con el resto.</p></div><div class="heading-icon">♧</div></div>
+    <div class="booking-layout">
+        <section class="panel booking-panel">
+            <div class="panel-title"><div><h2>Detalles de la reserva</h2><p>Los campos marcados son obligatorios.</p></div><span class="step-number">01</span></div>
+            <div asp-validation-summary="All" class="validation"></div>
+            <form asp-action="Crear" method="post" class="form-stack">
+                @Html.AntiForgeryToken()
+                <label>Restaurante<select name="restauranteId" class="form-select" required><option value="">Selecciona un restaurante</option>@foreach (Restaurante r in ViewBag.Restaurantes) { <option value="@r.Id">@r.Nombre</option> }</select></label>
+                <div class="form-grid">
+                    <label>Fecha<input type="date" name="fechaReserva" class="form-control" required min="@DateTime.Today.ToString("yyyy-MM-dd")" /></label>
+                    <label>Hora<input type="time" name="horaReserva" class="form-control" required /></label>
+                </div>
+                <label>Número de personas<select name="cantidadPersonas" class="form-select" required><option value="">¿Cuántas personas?</option>@for (var i=1; i<=20; i++) { <option value="@i">@i @(i == 1 ? "persona" : "personas")</option> }</select></label>
+                <label>Notas adicionales <span class="muted">(opcional)</span><textarea name="observaciones" class="form-control" rows="3" maxlength="500" placeholder="Alergias, ocasión especial o alguna solicitud..."></textarea></label>
+                <button type="submit" class="btn-sq">Solicitar reserva <span>→</span></button>
+                <p class="form-note">Tu solicitud quedará pendiente hasta que el restaurante la confirme.</p>
+            </form>
+        </section>
+        <aside class="booking-aside"><div class="aside-symbol">✦</div><h2>Una buena comida merece un buen momento.</h2><p>Elige la fecha, la hora y el tamaño de tu grupo. Te mostraremos la confirmación cuando el restaurante gestione tu solicitud.</p><div class="aside-line"></div><div class="aside-feature"><span>01</span><div><strong>Solicita</strong><small>Completa los detalles de tu visita.</small></div></div><div class="aside-feature"><span>02</span><div><strong>Espera confirmación</strong><small>El restaurante revisará tu solicitud.</small></div></div><div class="aside-feature"><span>03</span><div><strong>¡Disfruta!</strong><small>Ven y comparte el sabor dominicano.</small></div></div></aside>
+    </div>
+</div>

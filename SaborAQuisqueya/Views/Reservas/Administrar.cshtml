@@ -1,0 +1,13 @@
+@model IEnumerable<SaborAQuisqueya.Models.Reserva>
+@{ ViewData["Title"] = "Administrar reservas"; }
+<div class="page-wrap">
+    <div class="page-heading"><div><p class="eyebrow">PANEL ADMINISTRATIVO</p><h1>Gestión de reservas</h1><p class="muted">Revisa las solicitudes y actualiza su estado.</p></div><div class="heading-icon">▤</div></div>
+    @if (TempData["Mensaje"] != null) { <div class="alert alert-info">@TempData["Mensaje"]</div> }
+    <section class="panel table-panel"><div class="panel-title"><div><h2>Solicitudes registradas</h2><p>@Model.Count() reserva(s) en el sistema</p></div></div>
+    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Cliente</th><th>Restaurante / mesa</th><th>Fecha y hora</th><th>Personas</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+    @foreach (var r in Model) {
+        var statusClass = r.Estado == "Aceptada" ? "status-green" : r.Estado == "Rechazada" || r.Estado == "Cancelada" ? "status-red" : "status-amber";
+        <tr><td><strong>@(r.Usuario?.Nombre ?? "Cliente")</strong><small class="table-sub">@(r.Usuario?.Correo ?? "")</small></td><td>@(r.Restaurante?.Nombre ?? "—")<small class="table-sub">@(r.Mesa != null ? $"Mesa {r.Mesa.Numero}" : "Sin mesa asignada")</small></td><td>@r.FechaReserva.ToString("dd/MM/yyyy")<small class="table-sub">@DateTime.Today.Add(r.HoraReserva).ToString("hh:mm tt")</small></td><td>@r.CantidadPersonas</td><td><span class="status @statusClass">@r.Estado</span></td><td>@if (r.Estado == "Pendiente") { <div class="action-group"><form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/><input type="hidden" name="estado" value="Aceptada"/><button class="btn-mini btn-accept" type="submit">Aceptar</button></form><form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/><input type="hidden" name="estado" value="Rechazada"/><button class="btn-mini btn-reject" type="submit">Rechazar</button></form></div> } else { <span class="muted">Sin acciones</span> }</td></tr>
+    }
+    </tbody></table></div></section>
+</div>

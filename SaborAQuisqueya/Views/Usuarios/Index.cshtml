@@ -1,0 +1,15 @@
+@model IEnumerable<SaborAQuisqueya.Models.Usuario>
+@{ ViewData["Title"] = "Gestión de usuarios"; }
+<div class="page-wrap">
+    <div class="page-heading"><div><p class="eyebrow">PANEL ADMINISTRATIVO</p><h1>Gestión de usuarios</h1><p class="muted">Consulta las cuentas registradas y controla su estado de acceso.</p></div><div class="heading-icon">♙</div></div>
+    @if (TempData["Mensaje"] != null) { <div class="alert alert-info">@TempData["Mensaje"]</div> }
+    <section class="panel table-panel">
+        <div class="panel-title"><div><h2>Usuarios registrados</h2><p>@Model.Count() cuenta(s) en la plataforma</p></div></div>
+        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Usuario</th><th>Contacto</th><th>Rol</th><th>Fecha de registro</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
+        @foreach (var u in Model) {
+            <tr><td><strong>@u.Nombre</strong><small class="table-sub">ID #@u.Id</small></td><td>@u.Correo<small class="table-sub">@u.Telefono</small></td><td><span class="status @(u.Rol == "Administrador" ? "status-amber" : "status-green")">@u.Rol</span></td><td>@u.FechaRegistro.ToString("dd/MM/yyyy")</td><td><span class="status @(u.Activo ? "status-green" : "status-red")">@(u.Activo ? "Activo" : "Inactivo")</span></td><td><form asp-action="CambiarActivo" method="post" onsubmit="return confirm('¿Confirmas el cambio de estado de esta cuenta?');">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@u.Id"/><button class="btn-mini @(u.Activo ? "btn-reject" : "btn-accept")" type="submit">@(u.Activo ? "Desactivar" : "Activar")</button></form></td></tr>
+        }
+        </tbody></table></div>
+    </section>
+    <p class="form-note" style="margin-top:14px">Por seguridad, esta pantalla no muestra contraseñas ni hashes.</p>
+</div>

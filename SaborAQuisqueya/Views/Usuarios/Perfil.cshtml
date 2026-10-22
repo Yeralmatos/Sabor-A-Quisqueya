@@ -1,0 +1,17 @@
+@model SaborAQuisqueya.Models.Usuario
+@{ ViewData["Title"] = "Mi perfil"; }
+<div class="page-wrap">
+    <div class="page-heading"><div><p class="eyebrow">MI CUENTA</p><h1>Mi perfil</h1><p class="muted">Mantén tus datos de contacto actualizados.</p></div><div class="profile-avatar">@((Model.Nombre?.Length > 0) ? Model.Nombre.Substring(0,1).ToUpper() : "U")</div></div>
+    @if (TempData["Mensaje"] != null) { <div class="alert alert-success">@TempData["Mensaje"]</div> }
+    <section class="panel profile-panel">
+        <div class="panel-title"><div><h2>Información personal</h2><p>Datos asociados a tu cuenta</p></div><span class="status status-green">@(Model.Rol)</span></div>
+        <div asp-validation-summary="All" class="validation"></div>
+        <form asp-action="Perfil" method="post" class="form-grid">
+            @Html.AntiForgeryToken()
+            <label>Nombre completo<input name="nombre" value="@Model.Nombre" class="form-control" maxlength="100" required /></label>
+            <label>Correo electrónico<input value="@Model.Correo" class="form-control" readonly /><small>Contacta al administrador si necesitas cambiar el correo.</small></label>
+            <label>Teléfono<input name="telefono" value="@Model.Telefono" class="form-control" maxlength="20" required /></label>
+            <div class="form-actions"><button class="btn-sq" type="submit">Guardar cambios</button><a asp-controller="Reservas" asp-action="MisReservas" class="btn-outline-sq">Ver mis reservas</a></div>
+        </form>
+    </section>
+</div>

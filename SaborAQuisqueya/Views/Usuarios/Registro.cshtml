@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Crear cuenta";
+    Layout = "_AuthLayout";
+}
+<div class="auth-shell">
+    <section class="auth-card">
+        <div class="auth-brand"><img src="~/images/logo-sabor-quisqueya.jpg" alt="Logo de Sabor a Quisqueya" /><span>Sabor a Quisqueya</span></div>
+        <p class="eyebrow">ÚNETE A NUESTRA MESA</p>
+        <h1>Crea tu cuenta</h1>
+        <p class="muted">Regístrate para reservar tu próxima experiencia.</p>
+        <div asp-validation-summary="All" class="validation"></div>
+        <form asp-action="Registro" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <label>Nombre completo<input name="nombre" class="form-control" maxlength="100" required autocomplete="name" placeholder="Tu nombre" /></label>
+            <label>Correo electrónico<input name="correo" type="email" class="form-control" maxlength="150" required autocomplete="email" placeholder="tu@correo.com" /></label>
+            <label>Teléfono<input name="telefono" type="tel" class="form-control" maxlength="20" required autocomplete="tel" placeholder="809-000-0000" /></label>
+            <label>Contraseña<input name="contrasena" type="password" class="form-control" minlength="8" required autocomplete="new-password" placeholder="Mínimo 8 caracteres" /></label>
+            <button class="btn-sq" type="submit">Crear cuenta <span>→</span></button>
+        </form>
+        <p class="auth-footer">¿Ya tienes una cuenta? <a asp-action="Login">Inicia sesión</a></p>
+    </section>
+    <aside class="auth-art">
+        <img class="auth-logo" src="~/images/logo-sabor-quisqueya.jpg" alt="Sabor a Quisqueya: cocina que nos une" />
+        <div class="auth-art-copy"><h2>Los mejores momentos<br />comienzan alrededor<br />de una mesa.</h2><p>Reserva fácil. Disfruta más.</p></div>
+    </aside>
+</div>
