@@ -1,0 +1,207 @@
+﻿@model IEnumerable<SaborAQuisqueya.Models.Reserva>
+
+@{
+    ViewData["Title"] = "Dashboard Administrativo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var totalReservas = (int)ViewBag.TotalReservas;
+    var pendientes = (int)ViewBag.ReservasPendientes;
+    var aceptadas = (int)ViewBag.ReservasAceptadas;
+    var rechazadas = (int)ViewBag.ReservasRechazadas;
+    var canceladas = (int)ViewBag.ReservasCanceladas;
+    var totalMesas = (int)ViewBag.TotalMesas;
+    var totalClientes = (int)ViewBag.TotalClientes;
+}
+
+<div class="page-wrap">
+
+    <!-- ENCABEZADO -->
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+
+            <h1>Dashboard</h1>
+
+            <p class="muted">
+                Bienvenido al sistema de administración de Sabor a Quisqueya.
+                Consulta las estadísticas y supervisa las reservaciones.
+            </p>
+        </div>
+
+        <div class="heading-icon">📊</div>
+    </div>
+
+    <!-- ESTADÍSTICAS DE RESERVACIONES -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Total de reservaciones</p>
+                <h2 class="fw-bold">@totalReservas</h2>
+                <small class="text-muted">Reservaciones registradas</small>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Pendientes</p>
+                <h2 class="fw-bold text-warning">@pendientes</h2>
+                <small class="text-muted">Esperando aprobación</small>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Aceptadas</p>
+                <h2 class="fw-bold text-success">@aceptadas</h2>
+                <small class="text-muted">Reservaciones confirmadas</small>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Rechazadas</p>
+                <h2 class="fw-bold text-danger">@rechazadas</h2>
+                <small class="text-muted">Solicitudes rechazadas</small>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- INFORMACIÓN ADICIONAL -->
+    <div class="row g-3 mb-4">
+
+        <div class="col-lg-4 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Reservaciones canceladas</p>
+                <h2 class="fw-bold">@canceladas</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Mesas activas</p>
+                <h2 class="fw-bold">@totalMesas</h2>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+            <div class="panel p-4 h-100">
+                <p class="muted mb-2">Clientes registrados</p>
+                <h2 class="fw-bold">@totalClientes</h2>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ACCESOS RÁPIDOS -->
+    <section class="panel p-4 mb-4">
+
+        <h2 class="h4 fw-bold mb-3">Accesos rápidos</h2>
+
+        <div class="d-flex flex-wrap gap-3">
+
+            <a asp-controller="Reservas"
+               asp-action="Administrar"
+               class="btn btn-primary">
+                📅 Gestionar reservaciones
+            </a>
+
+            <a asp-controller="Usuarios"
+               asp-action="Index"
+               class="btn btn-outline-primary">
+                👥 Administrar usuarios
+            </a>
+
+        </div>
+
+    </section>
+
+    <!-- PRÓXIMAS RESERVACIONES -->
+    <section class="panel table-panel">
+
+        <div class="panel-title">
+            <div>
+                <h2>Próximas reservaciones</h2>
+                <p>Solicitudes pendientes y aceptadas.</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Mesa</th>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Personas</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-4">
+                                <p class="muted mb-0">
+                                    No existen próximas reservaciones.
+                                </p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var reserva in Model)
+                        {
+                            var estadoClase = reserva.Estado == "Aceptada"
+                            ? "status-green"
+                            : "status-amber";
+
+                            <tr>
+                                <td>
+                                    <strong>
+                                        @(reserva.Usuario?.Nombre ?? "Cliente")
+                                    </strong>
+                                </td>
+
+                                <td>
+                                    @(reserva.Mesa != null
+                                                                ? $"Mesa {reserva.Mesa.Numero}"
+                                                                : "Sin asignar")
+                                                                            </td>
+
+                                <td>
+                                    @reserva.FechaReserva.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    @(DateTime.Today
+                                                                .Add(reserva.HoraReserva)
+                                                                .ToString("hh:mm tt"))
+                        </td>
+
+                                <td>@reserva.CantidadPersonas</td>
+
+                                <td>
+                                    <span class="status @estadoClase">
+                                        @reserva.Estado
+                                    </span>
+                                </td>
+                            </tr>
+                                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>

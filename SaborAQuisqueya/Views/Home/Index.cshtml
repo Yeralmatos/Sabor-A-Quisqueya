@@ -1,8 +1,505 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    /* DISEÑO GENERAL */
+    .sq-inicio {
+        background: #faf7f1;
+        color: #092746;
+    }
+
+    /* IMAGEN PRINCIPAL */
+    .sq-hero {
+        position: relative;
+        min-height: 470px;
+        display: flex;
+        align-items: center;
+        background-image: linear-gradient(90deg, rgba(0,0,0,.83) 0%, rgba(0,0,0,.63) 32%, rgba(0,0,0,.08) 75%), url('/images/fondo-restaurante.png');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .sq-hero-contenido {
+        width: 100%;
+        max-width: 1280px;
+        margin: auto;
+        padding: 55px 35px;
+    }
+
+    .sq-hero-etiqueta {
+        color: white;
+        letter-spacing: 6px;
+        font-size: 13px;
+    }
+
+    .sq-hero h1 {
+        font-family: Georgia, serif;
+        font-size: clamp(55px, 7vw, 105px);
+        font-weight: bold;
+        line-height: .95;
+        color: white;
+        margin: 12px 0;
+    }
+
+        .sq-hero h1 span {
+            color: #d80b23;
+        }
+
+    .sq-hero-subtitulo {
+        color: white;
+        letter-spacing: 6px;
+        font-size: 15px;
+        margin: 18px 0;
+    }
+
+    .sq-hero-descripcion {
+        color: #f5f1eb;
+        font-family: Georgia, serif;
+        font-size: 19px;
+        max-width: 470px;
+        line-height: 1.4;
+        margin-bottom: 22px;
+    }
+
+    .sq-boton-rojo {
+        display: inline-block;
+        background: #c81020;
+        color: white;
+        padding: 13px 23px;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 700;
+        border: 1px solid #c81020;
+    }
+
+        .sq-boton-rojo:hover {
+            background: #a30918;
+            color: white;
+        }
+
+    .sq-boton-transparente {
+        display: inline-block;
+        padding: 13px 23px;
+        color: white;
+        border: 1px solid white;
+        border-radius: 7px;
+        text-decoration: none;
+        font-weight: 700;
+        background: rgba(0,0,0,.25);
+    }
+
+        .sq-boton-transparente:hover {
+            background: white;
+            color: #092746;
+        }
+
+    /* CARACTERÍSTICAS */
+    .sq-caracteristicas {
+        background: #fffaf4;
+        padding: 24px 0;
+    }
+
+    .sq-caracteristica {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+    }
+
+    .sq-icono {
+        width: 57px;
+        height: 57px;
+        min-width: 57px;
+        border-radius: 50%;
+        background: #c81020;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+    }
+
+        .sq-icono.azul {
+            background: #092746;
+        }
+
+    .sq-caracteristica h3 {
+        font-family: Georgia, serif;
+        font-size: 17px;
+        font-weight: bold;
+        margin-bottom: 4px;
+    }
+
+    .sq-caracteristica p {
+        font-size: 14px;
+        color: #555;
+        margin: 0;
+    }
+
+    /* MENÚ */
+    .sq-menu {
+        padding: 45px 0 55px;
+        background: #faf7f1;
+    }
+
+    .sq-etiqueta {
+        color: #c81020;
+        font-size: 14px;
+        letter-spacing: 5px;
+        font-weight: 600;
+    }
+
+    .sq-titulo {
+        font-family: Georgia, serif;
+        color: #092746;
+        font-size: clamp(35px, 5vw, 53px);
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .sq-subtitulo {
+        letter-spacing: 3px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    .sq-plato {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 100%;
+        box-shadow: 0 7px 18px rgba(0,0,0,.10);
+    }
+
+        .sq-plato img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+        }
+
+    .sq-plato-contenido {
+        padding: 13px 17px;
+    }
+
+    .sq-plato h3 {
+        font-family: Georgia, serif;
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .sq-plato p {
+        color: #555;
+        font-size: 14px;
+        min-height: 42px;
+        margin-bottom: 7px;
+    }
+
+    .sq-precio {
+        color: #c81020;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    /* PIE INFORMATIVO */
+    .sq-informacion {
+        position: relative;
+        background: #061f3a;
+        color: white;
+        overflow: hidden;
+    }
+
+    .sq-informacion-fondo {
+        position: absolute;
+        inset: 0;
+        background-image: linear-gradient(90deg, rgba(4,25,48,.25), rgba(4,25,48,.95) 32%, rgba(4,25,48,.97)), url('/images/fachada-restaurante.png');
+        background-size: cover;
+        background-position: center;
+    }
+
+    .sq-informacion-contenido {
+        position: relative;
+        z-index: 1;
+        padding: 28px 0;
+    }
+
+    .sq-dato {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+    }
+
+    .sq-dato-icono {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 50%;
+        background: #c81020;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 23px;
+    }
+
+    .sq-dato h3 {
+        font-size: 14px;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .sq-dato p {
+        font-size: 14px;
+        margin-bottom: 0;
+        line-height: 1.6;
+    }
+
+    @@media (max-width: 768px) {
+        .sq-hero {
+            min-height: 520px;
+        }
+
+        .sq-hero-contenido {
+            padding: 45px 20px;
+        }
+
+        .sq-hero h1 {
+            font-size: 58px;
+        }
+
+        .sq-hero-descripcion {
+            font-size: 17px;
+        }
+
+        .sq-informacion-fondo {
+            background-image: linear-gradient(rgba(4,25,48,.88), rgba(4,25,48,.95)), url('/images/fachada-restaurante.png');
+        }
+    }
+</style>
+
+<div class="sq-inicio">
+
+    <!-- IMAGEN PRINCIPAL -->
+    <section class="sq-hero">
+        <div class="sq-hero-contenido">
+
+            <span class="sq-hero-etiqueta">BIENVENIDO A</span>
+
+            <h1>
+                Sabor a<br />
+                <span>Quisqueya</span>
+            </h1>
+
+            <div class="sq-hero-subtitulo">
+                COCINA QUE NOS UNE
+            </div>
+
+            <p class="sq-hero-descripcion">
+                Disfruta de la auténtica gastronomía dominicana
+                en un ambiente acogedor, donde cada plato
+                representa nuestras raíces.
+            </p>
+
+            <div class="d-flex flex-wrap gap-3">
+
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <a asp-controller="Reservas"
+                       asp-action="Crear"
+                       class="sq-boton-rojo">
+                        Reservar mesa
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Usuarios"
+                       asp-action="Login"
+                       asp-route-ReturnUrl="/Reservas/Crear"
+                       class="sq-boton-rojo">
+                        Reservar mesa
+                    </a>
+                }
+
+                <a href="#menu" class="sq-boton-transparente">
+                    Conocer nuestro menú
+                </a>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- CARACTERÍSTICAS -->
+    <section id="informacion" class="sq-caracteristicas">
+        <div class="container">
+
+            <div class="row g-3">
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-caracteristica">
+                        <div class="sq-icono">🍴</div>
+                        <div>
+                            <h3>Comida dominicana</h3>
+                            <p>Platos tradicionales con el auténtico sabor de nuestra tierra.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-caracteristica">
+                        <div class="sq-icono azul">👥</div>
+                        <div>
+                            <h3>Ambiente familiar</h3>
+                            <p>Un lugar acogedor para compartir con familiares y amigos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-caracteristica">
+                        <div class="sq-icono">📅</div>
+                        <div>
+                            <h3>Reservas en línea</h3>
+                            <p>Reserva tu mesa de manera rápida y sencilla.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-caracteristica">
+                        <div class="sq-icono azul">📍</div>
+                        <div>
+                            <h3>Ubicación céntrica</h3>
+                            <p>Fácil acceso y un ambiente único en cada visita.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- MENÚ DESTACADO -->
+    <section id="menu" class="sq-menu">
+        <div class="container">
+
+            <div class="text-center mb-4">
+                <div class="sq-etiqueta">NUESTRO</div>
+                <h2 class="sq-titulo">Menú destacado</h2>
+                <div class="sq-subtitulo">PLATOS QUE NOS REPRESENTAN</div>
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-plato">
+                        <img src="~/images/bandera-dominicana.jpg"
+                             alt="La Bandera Dominicana" />
+
+                        <div class="sq-plato-contenido">
+                            <h3>La Bandera Dominicana</h3>
+                            <p>Arroz, habichuelas, carne guisada, ensalada y tostones.</p>
+                            <div class="sq-precio">RD$ 350</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-plato">
+                        <img src="~/images/sancocho.jpg"
+                             alt="Sancocho Dominicano" />
+
+                        <div class="sq-plato-contenido">
+                            <h3>Sancocho Dominicano</h3>
+                            <p>El tradicional sancocho de la casa.</p>
+                            <div class="sq-precio">RD$ 300</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-plato">
+                        <img src="~/images/mofongo.jpg"
+                             alt="Mofongo" />
+
+                        <div class="sq-plato-contenido">
+                            <h3>Mofongo</h3>
+                            <p>Mofongo de plátano con camarones en salsa criolla.</p>
+                            <div class="sq-precio">RD$ 450</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-6">
+                    <div class="sq-plato">
+                        <img src="~/images/chicharron.jpg"
+                             alt="Chicharrón de cerdo" />
+
+                        <div class="sq-plato-contenido">
+                            <h3>Chicharrón de Cerdo</h3>
+                            <p>Crujiente por fuera, jugoso por dentro.</p>
+                            <div class="sq-precio">RD$ 400</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- UBICACIÓN, HORARIOS Y CONTACTO -->
+    <section id="ubicacion" class="sq-informacion">
+
+        <div class="sq-informacion-fondo"></div>
+
+        <div class="container sq-informacion-contenido">
+
+            <div class="row g-4">
+
+                <div class="col-lg-4">
+                    <div class="sq-dato">
+                        <div class="sq-dato-icono">📍</div>
+
+                        <div>
+                            <h3>NUESTRA UBICACIÓN</h3>
+                            <p>
+                                Dirección pendiente de confirmar<br />
+                                República Dominicana
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="sq-dato">
+                        <div class="sq-dato-icono">◷</div>
+
+                        <div>
+                            <h3>HORARIOS DE ATENCIÓN</h3>
+                            <p>
+                                Horario pendiente de confirmar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4" id="contacto">
+                    <div class="sq-dato">
+                        <div class="sq-dato-icono">☎</div>
+
+                        <div>
+                            <h3>CONTÁCTANOS</h3>
+                            <p>
+                                Teléfono pendiente de confirmar<br />
+                                Correo pendiente de confirmar
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
 </div>

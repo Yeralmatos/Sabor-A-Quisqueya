@@ -1,13 +1,399 @@
 @model IEnumerable<SaborAQuisqueya.Models.Reserva>
-@{ ViewData["Title"] = "Administrar reservas"; }
+
+@{
+    ViewData["Title"] = "Administrar reservas";
+
+    // Diseño exclusivo del administrador
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // Resumen de las reservaciones
+    var totalReservas = Model.Count();
+    var pendientes = Model.Count(r => r.Estado == "Pendiente");
+    var aceptadas = Model.Count(r => r.Estado == "Aceptada");
+    var rechazadas = Model.Count(r => r.Estado == "Rechazada");
+    var canceladas = Model.Count(r => r.Estado == "Cancelada");
+}
+
 <div class="page-wrap">
-    <div class="page-heading"><div><p class="eyebrow">PANEL ADMINISTRATIVO</p><h1>Gestión de reservas</h1><p class="muted">Revisa las solicitudes y actualiza su estado.</p></div><div class="heading-icon">▤</div></div>
-    @if (TempData["Mensaje"] != null) { <div class="alert alert-info">@TempData["Mensaje"]</div> }
-    <section class="panel table-panel"><div class="panel-title"><div><h2>Solicitudes registradas</h2><p>@Model.Count() reserva(s) en el sistema</p></div></div>
-    <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Cliente</th><th>Restaurante / mesa</th><th>Fecha y hora</th><th>Personas</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
-    @foreach (var r in Model) {
-        var statusClass = r.Estado == "Aceptada" ? "status-green" : r.Estado == "Rechazada" || r.Estado == "Cancelada" ? "status-red" : "status-amber";
-        <tr><td><strong>@(r.Usuario?.Nombre ?? "Cliente")</strong><small class="table-sub">@(r.Usuario?.Correo ?? "")</small></td><td>@(r.Restaurante?.Nombre ?? "—")<small class="table-sub">@(r.Mesa != null ? $"Mesa {r.Mesa.Numero}" : "Sin mesa asignada")</small></td><td>@r.FechaReserva.ToString("dd/MM/yyyy")<small class="table-sub">@DateTime.Today.Add(r.HoraReserva).ToString("hh:mm tt")</small></td><td>@r.CantidadPersonas</td><td><span class="status @statusClass">@r.Estado</span></td><td>@if (r.Estado == "Pendiente") { <div class="action-group"><form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/><input type="hidden" name="estado" value="Aceptada"/><button class="btn-mini btn-accept" type="submit">Aceptar</button></form><form asp-action="CambiarEstado" method="post">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@r.Id"/><input type="hidden" name="estado" value="Rechazada"/><button class="btn-mini btn-reject" type="submit">Rechazar</button></form></div> } else { <span class="muted">Sin acciones</span> }</td></tr>
+
+    <!-- ========================================== -->
+    <!-- ENCABEZADO DEL MÓDULO -->
+    <!-- ========================================== -->
+
+    <div class="page-heading">
+
+        <div>
+            <p class="eyebrow">
+                ADMINISTRACIÓN / RESERVACIONES
+            </p>
+
+            <h1>Gestión de reservaciones</h1>
+
+            <p class="muted">
+                Consulta las solicitudes realizadas por los clientes,
+                verifica las mesas asignadas y administra el estado
+                de cada reservación.
+            </p>
+        </div>
+
+        <div class="heading-icon">
+            📅
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- MENSAJES DEL SISTEMA -->
+    <!-- ========================================== -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show"
+             role="alert">
+
+            @TempData["Mensaje"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Cerrar">
+            </button>
+
+        </div>
     }
-    </tbody></table></div></section>
+
+
+    <!-- ========================================== -->
+    <!-- RESUMEN DE RESERVACIONES -->
+    <!-- ========================================== -->
+
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL -->
+        <div class="col-lg-3 col-md-6">
+
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">
+                    Total de reservaciones
+                </p>
+
+                <h2 class="fw-bold mb-0">
+                    @totalReservas
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- PENDIENTES -->
+        <div class="col-lg-3 col-md-6">
+
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">
+                    Pendientes
+                </p>
+
+                <h2 class="fw-bold text-warning mb-0">
+                    @pendientes
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- ACEPTADAS -->
+        <div class="col-lg-3 col-md-6">
+
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">
+                    Aceptadas
+                </p>
+
+                <h2 class="fw-bold text-success mb-0">
+                    @aceptadas
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- RECHAZADAS -->
+        <div class="col-lg-3 col-md-6">
+
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">
+                    Rechazadas
+                </p>
+
+                <h2 class="fw-bold text-danger mb-0">
+                    @rechazadas
+                </h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TABLA DE RESERVACIONES -->
+    <!-- ========================================== -->
+
+    <section class="panel table-panel">
+
+        <!-- TÍTULO DE LA TABLA -->
+        <div class="panel-title">
+
+            <div>
+
+                <h2>Solicitudes registradas</h2>
+
+                <p>
+                    @totalReservas reservación(es) registradas
+                    en el sistema.
+                    @canceladas cancelada(s).
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLA -->
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <!-- ENCABEZADOS -->
+                <thead>
+
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Mesa asignada</th>
+                        <th>Fecha y hora</th>
+                        <th>Personas</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+
+                </thead>
+
+
+                <!-- CONTENIDO -->
+                <tbody>
+
+                    @if (!Model.Any())
+                    {
+                        <!-- SIN RESERVACIONES -->
+                        <tr>
+
+                            <td colspan="6"
+                                class="text-center py-5">
+
+                                <h5 class="fw-bold">
+                                    No hay reservaciones registradas
+                                </h5>
+
+                                <p class="muted mb-0">
+                                    Cuando los clientes realicen
+                                    solicitudes, aparecerán aquí.
+                                </p>
+
+                            </td>
+
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var reserva in Model)
+                        {
+                            // Determinar color del estado
+                            var statusClass = reserva.Estado switch
+                            {
+                                "Aceptada" => "status-green",
+                                "Rechazada" => "status-red",
+                                "Cancelada" => "status-red",
+                                _ => "status-amber"
+                            };
+
+                            <tr>
+
+                                <!-- ========================== -->
+                                <!-- CLIENTE -->
+                                <!-- ========================== -->
+
+                                <td>
+
+                                    <strong>
+                                        @(reserva.Usuario?.Nombre ?? "Cliente")
+                                    </strong>
+
+                                    <small class="table-sub">
+                                        @(reserva.Usuario?.Correo ?? "")
+                                    </small>
+
+                                </td>
+
+
+                                <!-- ========================== -->
+                                <!-- MESA -->
+                                <!-- ========================== -->
+
+                                <td>
+
+                                    @if (reserva.Mesa != null)
+                                    {
+                                        <strong>
+                                            Mesa @reserva.Mesa.Numero
+                                        </strong>
+
+                                        <small class="table-sub">
+                                            Capacidad:
+                                            @reserva.Mesa.Capacidad personas
+                                        </small>
+                                    }
+                                    else
+                                    {
+                                        <span class="muted">
+                                            Sin mesa asignada
+                                        </span>
+                                    }
+
+                            </td>
+
+
+                            <!-- ========================== -->
+                            <!-- FECHA Y HORA -->
+                            <!-- ========================== -->
+
+                            <td>
+
+                                <strong>
+                                    @reserva.FechaReserva.ToString("dd/MM/yyyy")
+                                </strong>
+
+                                <small class="table-sub">
+                                    @(DateTime.Today
+                                                                    .Add(reserva.HoraReserva)
+                                                                    .ToString("hh:mm tt"))
+                            </small>
+
+                                </td>
+
+
+                                <!-- ========================== -->
+                                <!-- CANTIDAD DE PERSONAS -->
+                                <!-- ========================== -->
+
+                                <td>
+
+                                    <span class="fw-semibold">
+                                        @reserva.CantidadPersonas
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ========================== -->
+                                <!-- ESTADO -->
+                                <!-- ========================== -->
+
+                                <td>
+
+                                    <span class="status @statusClass">
+                                        @reserva.Estado
+                                    </span>
+
+                                </td>
+
+
+                                <!-- ========================== -->
+                                <!-- ACCIONES -->
+                                <!-- ========================== -->
+
+                                <td>
+
+                            @if (reserva.Estado == "Pendiente")
+                                    {
+                                        <div class="action-group">
+
+                                            <!-- ACEPTAR -->
+                                            <form asp-controller="Reservas"
+                                                  asp-action="CambiarEstado"
+                                                  method="post"
+                                                  onsubmit="return confirm('¿Deseas aceptar esta reservación?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@reserva.Id" />
+
+                                                <input type="hidden"
+                                                       name="estado"
+                                                       value="Aceptada" />
+
+                                                <button type="submit"
+                                                        class="btn-mini btn-accept">
+
+                                                    Aceptar
+
+                                                </button>
+
+                                            </form>
+
+
+                                            <!-- RECHAZAR -->
+                                            <form asp-controller="Reservas"
+                                                  asp-action="CambiarEstado"
+                                                  method="post"
+                                                  onsubmit="return confirm('¿Deseas rechazar esta reservación?');">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@reserva.Id" />
+
+                                                <input type="hidden"
+                                                       name="estado"
+                                                       value="Rechazada" />
+
+                                                <button type="submit"
+                                                        class="btn-mini btn-reject">
+
+                                                    Rechazar
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="muted">
+                                            Sin acciones disponibles
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
 </div>

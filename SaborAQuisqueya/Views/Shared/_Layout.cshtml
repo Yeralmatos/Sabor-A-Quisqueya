@@ -1,52 +1,290 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SaborAQuisqueya</title>
+
+    <title>@ViewData["Title"] - Sabor a Quisqueya</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/SaborAQuisqueya.styles.css" asp-append-version="true" />
-    <link rel="stylesheet"
-          href="~/css/gestion-sabor.css"
-          asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/gestion-sabor.css" asp-append-version="true" />
+
+    <style>
+        .sq-navbar {
+            background: #fff;
+            padding: 12px 0;
+            box-shadow: 0 2px 12px rgba(0,0,0,.07);
+        }
+
+            .sq-navbar .container {
+                max-width: 1380px;
+            }
+
+        .sq-logo {
+            width: 230px;
+            max-height: 65px;
+            object-fit: contain;
+        }
+
+        .sq-navbar .nav-link {
+            color: #29251f;
+            font-weight: 500;
+            margin: 0 8px;
+            font-size: 15px;
+        }
+
+            .sq-navbar .nav-link:hover {
+                color: #a63b2b;
+            }
+
+            .sq-navbar .nav-link.active {
+                color: #a63b2b;
+                font-weight: 700;
+            }
+
+        .sq-btn-login {
+            border: 1px solid #0b3159;
+            color: #0b3159;
+            background: #fff;
+            border-radius: 7px;
+            padding: 10px 17px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .sq-btn-login:hover {
+                background: #0b3159;
+                color: #fff;
+            }
+
+        .sq-btn-reserva {
+            background: #b60918;
+            color: white;
+            border: 1px solid #b60918;
+            border-radius: 7px;
+            padding: 10px 17px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .sq-btn-reserva:hover {
+                background: #900715;
+                color: #fff;
+            }
+
+        .sq-footer {
+            background: #082747;
+            color: #fff;
+            padding: 30px 0;
+        }
+
+            .sq-footer p {
+                margin-bottom: 5px;
+                color: #dce5ef;
+            }
+
+        @@media (max-width: 991px) {
+            .sq-logo {
+                width: 185px;
+            }
+
+            .sq-navbar .navbar-nav {
+                margin: 18px 0;
+            }
+
+            .sq-navbar .nav-link {
+                margin: 4px 0;
+            }
+
+            .sq-navbar .sq-actions {
+                flex-wrap: wrap;
+                padding-bottom: 10px;
+            }
+        }
+    </style>
 </head>
-<body>
+
+<body style="background-color:#faf7f2;">
+
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SaborAQuisqueya</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+        <nav class="navbar navbar-expand-lg sq-navbar">
+            <div class="container">
+
+                <!-- LOGO -->
+                <a class="navbar-brand"
+                   asp-controller="Home"
+                   asp-action="Index">
+
+                    <img src="~/images/logo-sabor-quisqueya.jpg"
+                         alt="Sabor a Quisqueya"
+                         class="sq-logo" />
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal"
+                        aria-expanded="false"
+                        aria-label="Abrir menú">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse"
+                     id="menuPrincipal">
+
+                    <!-- MENÚ CENTRAL -->
+                    <ul class="navbar-nav mx-auto align-items-lg-center">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Inicio
+                            </a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="informacion">
+                                Nosotros
+                            </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="menu">
+                                Nuestro menú
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="ubicacion">
+                                Ubicación
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index"
+                               asp-fragment="ubicacion">
+                                Contacto
+                            </a>
+                        </li>
+
+                        @if (User.Identity?.IsAuthenticated == true &&
+                                                User.IsInRole("Cliente"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Reservas"
+                                   asp-action="MisReservas">
+                                    Mis reservas
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Usuarios"
+                                   asp-action="Perfil">
+                                    Mi perfil
+                                </a>
+                            </li>
+                        }
+
                     </ul>
+
+                    <!-- BOTONES -->
+                    <div class="d-flex gap-2 align-items-center sq-actions">
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <form asp-controller="Usuarios"
+                                  asp-action="Logout"
+                                  method="post"
+                                  class="m-0">
+
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit"
+                                        class="sq-btn-login">
+                                    Cerrar sesión
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Usuarios"
+                               asp-action="Login"
+                               class="sq-btn-login">
+                                Iniciar sesión
+                            </a>
+                        }
+
+                        @if (!User.IsInRole("Administrador"))
+                        {
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a asp-controller="Reservas"
+                                   asp-action="Crear"
+                                   class="sq-btn-reserva">
+                                    Reservar mesa
+                                </a>
+                            }
+                            else
+                            {
+                                <a asp-controller="Usuarios"
+                                   asp-action="Login"
+                                   asp-route-returnUrl="/Reservas/Crear"
+                                   class="sq-btn-reserva">
+                                    Reservar mesa
+                                </a>
+                            }
+                        }
+
+                    </div>
+
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - SaborAQuisqueya - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="sq-footer">
+        <div class="container text-center">
+
+            <h5 class="fw-bold">
+                Sabor a Quisqueya
+            </h5>
+
+            <p>Cocina que nos une.</p>
+
+            <small>
+                © 2026 Sabor a Quisqueya. Todos los derechos reservados.
+            </small>
+
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/jquery/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

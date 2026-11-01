@@ -1,24 +1,224 @@
-@using SaborAQuisqueya.Models
-@{ ViewData["Title"] = "Nueva reserva"; }
+@{
+    ViewData["Title"] = "Nueva reserva";
+}
+
 <div class="page-wrap">
-    <div class="page-heading"><div><p class="eyebrow">RESERVACIONES</p><h1>Reserva tu mesa</h1><p class="muted">Completa los detalles y nosotros te ayudaremos con el resto.</p></div><div class="heading-icon">♧</div></div>
-    <div class="booking-layout">
-        <section class="panel booking-panel">
-            <div class="panel-title"><div><h2>Detalles de la reserva</h2><p>Los campos marcados son obligatorios.</p></div><span class="step-number">01</span></div>
-            <div asp-validation-summary="All" class="validation"></div>
-            <form asp-action="Crear" method="post" class="form-stack">
-                @Html.AntiForgeryToken()
-                <label>Restaurante<select name="restauranteId" class="form-select" required><option value="">Selecciona un restaurante</option>@foreach (Restaurante r in ViewBag.Restaurantes) { <option value="@r.Id">@r.Nombre</option> }</select></label>
-                <div class="form-grid">
-                    <label>Fecha<input type="date" name="fechaReserva" class="form-control" required min="@DateTime.Today.ToString("yyyy-MM-dd")" /></label>
-                    <label>Hora<input type="time" name="horaReserva" class="form-control" required /></label>
-                </div>
-                <label>Número de personas<select name="cantidadPersonas" class="form-select" required><option value="">¿Cuántas personas?</option>@for (var i=1; i<=20; i++) { <option value="@i">@i @(i == 1 ? "persona" : "personas")</option> }</select></label>
-                <label>Notas adicionales <span class="muted">(opcional)</span><textarea name="observaciones" class="form-control" rows="3" maxlength="500" placeholder="Alergias, ocasión especial o alguna solicitud..."></textarea></label>
-                <button type="submit" class="btn-sq">Solicitar reserva <span>→</span></button>
-                <p class="form-note">Tu solicitud quedará pendiente hasta que el restaurante la confirme.</p>
-            </form>
-        </section>
-        <aside class="booking-aside"><div class="aside-symbol">✦</div><h2>Una buena comida merece un buen momento.</h2><p>Elige la fecha, la hora y el tamaño de tu grupo. Te mostraremos la confirmación cuando el restaurante gestione tu solicitud.</p><div class="aside-line"></div><div class="aside-feature"><span>01</span><div><strong>Solicita</strong><small>Completa los detalles de tu visita.</small></div></div><div class="aside-feature"><span>02</span><div><strong>Espera confirmación</strong><small>El restaurante revisará tu solicitud.</small></div></div><div class="aside-feature"><span>03</span><div><strong>¡Disfruta!</strong><small>Ven y comparte el sabor dominicano.</small></div></div></aside>
+
+    <!-- ENCABEZADO -->
+    <div class="page-heading">
+
+        <div>
+            <p class="eyebrow">SABOR A QUISQUEYA / RESERVACIONES</p>
+
+            <h1>Reserva tu mesa</h1>
+
+            <p class="muted">
+                Selecciona la fecha, la hora y la cantidad de personas
+                para disfrutar de nuestra gastronomía dominicana.
+            </p>
+        </div>
+
+        <div class="heading-icon">
+            📅
+        </div>
+
     </div>
+
+    <div class="booking-layout">
+
+        <!-- FORMULARIO DE RESERVACIÓN -->
+        <section class="panel booking-panel">
+
+            <div class="panel-title">
+
+                <div>
+                    <h2>Detalles de la reserva</h2>
+
+                    <p>
+                        Completa los siguientes datos para solicitar tu mesa.
+                    </p>
+                </div>
+
+                <span class="step-number">01</span>
+
+            </div>
+
+            <!-- MENSAJES DE VALIDACIÓN -->
+            <div asp-validation-summary="All"
+                 class="validation">
+            </div>
+
+            <!-- FORMULARIO -->
+            <form asp-controller="Reservas"
+                  asp-action="Crear"
+                  method="post"
+                  class="form-stack">
+
+                @Html.AntiForgeryToken()
+
+                <!-- FECHA Y HORA -->
+                <div class="form-grid">
+
+                    <label>
+                        Fecha de la reserva
+
+                        <input type="date"
+                               name="fechaReserva"
+                               class="form-control"
+                               required
+                               min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+                    </label>
+
+                    <label>
+                        Hora de la reserva
+
+                        <input type="time"
+                               name="horaReserva"
+                               class="form-control"
+                               required />
+                    </label>
+
+                </div>
+
+                <!-- CANTIDAD DE PERSONAS -->
+                <label>
+                    Número de personas
+
+                    <select name="cantidadPersonas"
+                            class="form-select"
+                            required>
+
+                        <option value="">
+                            ¿Cuántas personas?
+                        </option>
+
+                        @for (var i = 1; i <= 20; i++)
+                        {
+                            <option value="@i">
+                                @i @(i == 1 ? "persona" : "personas")
+                            </option>
+                        }
+
+                    </select>
+                </label>
+
+                <!-- NOTAS ADICIONALES -->
+                <label>
+                    Notas adicionales
+                    <span class="muted">(opcional)</span>
+
+                    <textarea name="observaciones"
+                              class="form-control"
+                              rows="3"
+                              maxlength="500"
+                              placeholder="Alergias, ocasión especial o alguna solicitud...">
+                    </textarea>
+                </label>
+
+                <!-- BOTÓN PARA ENVIAR -->
+                <button type="submit"
+                        class="btn-sq">
+
+                    Solicitar reserva
+                    <span>→</span>
+
+                </button>
+
+                <!-- INFORMACIÓN -->
+                <p class="form-note">
+                    Tu solicitud será registrada como pendiente.
+                    El administrador deberá aceptarla o rechazarla.
+                    Recibirás una notificación por correo electrónico
+                    cuando tu solicitud sea procesada.
+                </p>
+
+            </form>
+
+        </section>
+
+        <!-- PANEL INFORMATIVO -->
+        <aside class="booking-aside">
+
+            <div class="aside-symbol">
+                ✦
+            </div>
+
+            <h2>
+                Una buena comida merece
+                un buen momento.
+            </h2>
+
+            <p>
+                En Sabor a Quisqueya queremos que disfrutes
+                de una experiencia especial. Solicita tu mesa
+                y espera nuestra confirmación.
+            </p>
+
+            <div class="aside-line"></div>
+
+            <!-- PASO 1 -->
+            <div class="aside-feature">
+
+                <span>01</span>
+
+                <div>
+                    <strong>Solicita tu mesa</strong>
+
+                    <small>
+                        Selecciona fecha, hora y cantidad de personas.
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- PASO 2 -->
+            <div class="aside-feature">
+
+                <span>02</span>
+
+                <div>
+                    <strong>Espera la confirmación</strong>
+
+                    <small>
+                        El administrador revisará tu solicitud.
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- PASO 3 -->
+            <div class="aside-feature">
+
+                <span>03</span>
+
+                <div>
+                    <strong>Recibe la respuesta</strong>
+
+                    <small>
+                        Te notificaremos por correo cuando
+                        tu reserva sea aceptada o rechazada.
+                    </small>
+                </div>
+
+            </div>
+
+            <!-- PASO 4 -->
+            <div class="aside-feature">
+
+                <span>04</span>
+
+                <div>
+                    <strong>¡Disfruta!</strong>
+
+                    <small>
+                        Visítanos en la fecha y hora confirmadas.
+                    </small>
+                </div>
+
+            </div>
+
+        </aside>
+
+    </div>
+
 </div>

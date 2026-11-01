@@ -1,15 +1,291 @@
 @model IEnumerable<SaborAQuisqueya.Models.Usuario>
-@{ ViewData["Title"] = "Gestión de usuarios"; }
+
+@{
+    ViewData["Title"] = "Gestión de usuarios";
+
+    // Diseño exclusivo del administrador
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    // Estadísticas
+    var totalUsuarios = Model.Count();
+    var totalClientes = Model.Count(u => u.Rol == "Cliente");
+    var totalAdministradores = Model.Count(u => u.Rol == "Administrador");
+    var usuariosActivos = Model.Count(u => u.Activo);
+    var usuariosInactivos = Model.Count(u => !u.Activo);
+}
+
 <div class="page-wrap">
-    <div class="page-heading"><div><p class="eyebrow">PANEL ADMINISTRATIVO</p><h1>Gestión de usuarios</h1><p class="muted">Consulta las cuentas registradas y controla su estado de acceso.</p></div><div class="heading-icon">♙</div></div>
-    @if (TempData["Mensaje"] != null) { <div class="alert alert-info">@TempData["Mensaje"]</div> }
+
+    <!-- ENCABEZADO -->
+    <div class="page-heading">
+
+        <div>
+            <p class="eyebrow">PANEL ADMINISTRATIVO / USUARIOS</p>
+
+            <h1>Gestión de usuarios</h1>
+
+            <p class="muted">
+                Consulta las cuentas registradas, identifica sus roles
+                y administra su estado de acceso al sistema.
+            </p>
+        </div>
+
+        <div class="heading-icon">
+            👥
+        </div>
+
+    </div>
+
+    <!-- MENSAJES -->
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="alert alert-info alert-dismissible fade show"
+             role="alert">
+
+            @TempData["Mensaje"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Cerrar">
+            </button>
+        </div>
+    }
+
+    <!-- TARJETAS DE ESTADÍSTICAS -->
+    <div class="row g-3 mb-4">
+
+        <!-- TOTAL -->
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">Total de usuarios</p>
+
+                <h2 class="fw-bold mb-0">
+                    @totalUsuarios
+                </h2>
+
+            </div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">Clientes registrados</p>
+
+                <h2 class="fw-bold mb-0">
+                    @totalClientes
+                </h2>
+
+            </div>
+        </div>
+
+        <!-- ADMINISTRADORES -->
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">Administradores</p>
+
+                <h2 class="fw-bold mb-0">
+                    @totalAdministradores
+                </h2>
+
+            </div>
+        </div>
+
+        <!-- ACTIVOS -->
+        <div class="col-lg-3 col-md-6">
+            <div class="panel p-4 h-100">
+
+                <p class="muted mb-2">Usuarios activos</p>
+
+                <h2 class="fw-bold text-success mb-0">
+                    @usuariosActivos
+                </h2>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLA DE USUARIOS -->
     <section class="panel table-panel">
-        <div class="panel-title"><div><h2>Usuarios registrados</h2><p>@Model.Count() cuenta(s) en la plataforma</p></div></div>
-        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Usuario</th><th>Contacto</th><th>Rol</th><th>Fecha de registro</th><th>Estado</th><th>Acción</th></tr></thead><tbody>
-        @foreach (var u in Model) {
-            <tr><td><strong>@u.Nombre</strong><small class="table-sub">ID #@u.Id</small></td><td>@u.Correo<small class="table-sub">@u.Telefono</small></td><td><span class="status @(u.Rol == "Administrador" ? "status-amber" : "status-green")">@u.Rol</span></td><td>@u.FechaRegistro.ToString("dd/MM/yyyy")</td><td><span class="status @(u.Activo ? "status-green" : "status-red")">@(u.Activo ? "Activo" : "Inactivo")</span></td><td><form asp-action="CambiarActivo" method="post" onsubmit="return confirm('¿Confirmas el cambio de estado de esta cuenta?');">@Html.AntiForgeryToken()<input type="hidden" name="id" value="@u.Id"/><button class="btn-mini @(u.Activo ? "btn-reject" : "btn-accept")" type="submit">@(u.Activo ? "Desactivar" : "Activar")</button></form></td></tr>
-        }
-        </tbody></table></div>
+
+        <div class="panel-title">
+
+            <div>
+                <h2>Usuarios registrados</h2>
+
+                <p>
+                    @totalUsuarios cuenta(s) registrada(s).
+                    @usuariosInactivos inactiva(s).
+                </p>
+            </div>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <!-- ENCABEZADOS -->
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Contacto</th>
+                        <th>Rol</th>
+                        <th>Fecha de registro</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+
+                <!-- CONTENIDO -->
+                <tbody>
+
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+
+                                <h5 class="fw-bold">
+                                    No hay usuarios registrados
+                                </h5>
+
+                                <p class="muted mb-0">
+                                    Las cuentas aparecerán aquí
+                                    cuando los usuarios se registren.
+                                </p>
+
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        @foreach (var usuario in Model)
+                        {
+                            var esUsuarioActual =
+                            User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                            == usuario.Id.ToString();
+
+                            <tr>
+
+                                <!-- NOMBRE -->
+                                <td>
+                                    <strong>
+                                        @usuario.Nombre
+                                    </strong>
+
+                                    <small class="table-sub">
+                                        ID #@usuario.Id
+                                    </small>
+                                </td>
+
+                                <!-- CORREO Y TELÉFONO -->
+                                <td>
+                                    @usuario.Correo
+
+                                    <small class="table-sub">
+                                        @usuario.Telefono
+                                    </small>
+                                </td>
+
+                                <!-- ROL -->
+                                <td>
+                                    @if (usuario.Rol == "Administrador")
+                                    {
+                                        <span class="status status-amber">
+                                            Administrador
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status status-green">
+                                            Cliente
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- FECHA DE REGISTRO -->
+                                <td>
+                                    @usuario.FechaRegistro.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <!-- ESTADO -->
+                                <td>
+                                    @if (usuario.Activo)
+                                    {
+                                        <span class="status status-green">
+                                            Activo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="status status-red">
+                                            Inactivo
+                                        </span>
+                                    }
+                                </td>
+
+                                <!-- ACCIONES -->
+                                <td>
+
+                                    @if (esUsuarioActual)
+                                    {
+                                        <span class="text-muted small">
+                                            Tu cuenta
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <form asp-controller="Usuarios"
+                                              asp-action="CambiarActivo"
+                                              method="post"
+                                              onsubmit="return confirm('¿Confirmas el cambio de estado de esta cuenta?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@usuario.Id" />
+
+                                            @if (usuario.Activo)
+                                            {
+                                                <button type="submit"
+                                                        class="btn-mini btn-reject">
+                                                    Desactivar
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <button type="submit"
+                                                        class="btn-mini btn-accept">
+                                                    Activar
+                                                </button>
+                                            }
+
+                                        </form>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
     </section>
-    <p class="form-note" style="margin-top:14px">Por seguridad, esta pantalla no muestra contraseñas ni hashes.</p>
+
+    <!-- NOTA DE SEGURIDAD -->
+    <p class="form-note mt-3">
+        Por seguridad, esta pantalla no muestra contraseñas
+        ni hashes de los usuarios.
+    </p>
+
 </div>

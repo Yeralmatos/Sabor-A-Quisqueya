@@ -1,53 +1,90 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SaborAQuisqueya.Data;
+using SaborAQuisqueya.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Agregar servicios MVC
+// ==========================================
+// 1. CONFIGURAR SERVICIOS MVC
+// ==========================================
+
 builder.Services.AddControllersWithViews();
 
-// Configurar conexión a SQL Server
+
+// ==========================================
+// 2. CONFIGURAR SQL SERVER
+// ==========================================
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-options.UseSqlServer(
-builder.Configuration.GetConnectionString("DefaultConnection")
-)
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    )
 );
 
-// Configurar autenticación por cookies
-builder.Services
-.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-.AddCookie(options =>
-{
-    options.LoginPath = "/Usuarios/Login";
-    options.AccessDeniedPath = "/Home/AccessDenied";
-});
 
-// Configurar autorización
+// ==========================================
+// 3. CONFIGURAR AUTENTICACIÓN POR COOKIES
+// ==========================================
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Usuarios/Login";
+        options.AccessDeniedPath = "/Home/AccessDenied";
+    });
+
+
+// ==========================================
+// 4. CONFIGURAR AUTORIZACIÓN
+// ==========================================
+
 builder.Services.AddAuthorization();
+
+
+// ==========================================
+// 5. REGISTRAR SERVICIO DE CORREO
+// ==========================================
+
+// Permite utilizar EmailService en los controladores.
+builder.Services.AddTransient<EmailService>();
+
 
 var app = builder.Build();
 
-// Configuración de errores
+
+// ==========================================
+// 6. CONFIGURACIÓN DE ERRORES
+// ==========================================
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
-// Configuración del sistema
+
+// ==========================================
+// 7. CONFIGURACIÓN DEL SISTEMA
+// ==========================================
+
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
 
-// IMPORTANTE: primero autenticación, luego autorización
-app.UseAuthentication();
-app.UseAuthorization();
 
-// Ruta principal
+// IMPORTANTE: autenticación antes de autorización
+app.UseAuthentication();
+
+app.UseAuthorization();
+ 
+
 app.MapControllerRoute(
-name: "default",
-pattern: "{controller=Home}/{action=Index}/{id?}");
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
 
 app.Run();

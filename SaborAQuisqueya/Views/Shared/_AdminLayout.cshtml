@@ -1,0 +1,551 @@
+﻿@{
+    var nombreAdministrador = User.Identity?.Name ?? "Administrador";
+
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
+    var accion = ViewContext.RouteData.Values["action"]?.ToString();
+
+    var inicial = nombreAdministrador.Length > 0
+        ? nombreAdministrador.Substring(0, 1).ToUpper()
+        : "A";
+}
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Administración | Sabor a Quisqueya</title>
+
+    <!-- BOOTSTRAP -->
+    <link rel="stylesheet"
+          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- ESTILOS DEL PROYECTO -->
+    <link rel="stylesheet"
+          href="~/css/site.css"
+          asp-append-version="true" />
+
+    <link rel="stylesheet"
+          href="~/css/gestion-sabor.css"
+          asp-append-version="true" />
+
+    <style>
+
+        :root {
+            --admin-azul: #102b49;
+            --admin-azul-oscuro: #091d33;
+            --admin-rojo: #b83b32;
+            --admin-fondo: #f4f6f9;
+            --admin-texto: #243247;
+            --admin-blanco: #ffffff;
+            --admin-borde: #e7ebef;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--admin-fondo);
+            color: var(--admin-texto);
+            font-family: Arial, sans-serif;
+        }
+
+        /* =====================================
+                   ESTRUCTURA GENERAL
+                ===================================== */
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =====================================
+                   MENÚ LATERAL
+                ===================================== */
+
+        .admin-sidebar {
+            width: 260px;
+            background: var(--admin-azul);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+        }
+
+        /* LOGO */
+
+        .admin-logo {
+            padding: 25px 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,.12);
+        }
+
+            .admin-logo img {
+                width: 75px;
+                height: 75px;
+                object-fit: cover;
+                border-radius: 50%;
+                margin-bottom: 12px;
+            }
+
+            .admin-logo h2 {
+                font-size: 19px;
+                font-weight: bold;
+                color: white;
+                margin-bottom: 5px;
+            }
+
+            .admin-logo p {
+                font-size: 11px;
+                letter-spacing: 2px;
+                color: #c9d5e2;
+                margin: 0;
+            }
+
+        /* =====================================
+                   NAVEGACIÓN ADMINISTRATIVA
+                ===================================== */
+
+        .admin-menu {
+            padding: 20px 12px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .admin-menu-titulo {
+            color: #91a9c0;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 1.5px;
+            padding: 12px 15px 8px;
+        }
+
+        .admin-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 15px;
+            margin-bottom: 6px;
+            color: #e5edf5;
+            text-decoration: none;
+            border-radius: 9px;
+            font-size: 15px;
+            transition: background .2s;
+        }
+
+            .admin-menu a:hover {
+                background: rgba(255,255,255,.10);
+                color: white;
+            }
+
+            .admin-menu a.activo {
+                background: rgba(255,255,255,.17);
+                color: white;
+                font-weight: bold;
+                border-left: 3px solid #e1b36a;
+            }
+
+        .admin-menu .icono {
+            width: 25px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        /* =====================================
+                   CERRAR SESIÓN
+                ===================================== */
+
+        .admin-salir {
+            padding: 18px;
+            border-top: 1px solid rgba(255,255,255,.12);
+        }
+
+            .admin-salir button {
+                width: 100%;
+                background: var(--admin-rojo);
+                color: white;
+                border: none;
+                border-radius: 9px;
+                padding: 12px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+                .admin-salir button:hover {
+                    background: #992d27;
+                }
+
+        /* =====================================
+                   CONTENIDO PRINCIPAL
+                ===================================== */
+
+        .admin-main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =====================================
+                   ENCABEZADO SUPERIOR
+                ===================================== */
+
+        .admin-header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--admin-borde);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+            .admin-header h1 {
+                color: var(--admin-azul);
+                font-size: 22px;
+                font-weight: bold;
+                margin: 0;
+            }
+
+        .admin-header-subtitulo {
+            color: #778394;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        /* USUARIO */
+
+        .admin-usuario {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-usuario-info {
+            text-align: right;
+        }
+
+            .admin-usuario-info strong {
+                display: block;
+                font-size: 14px;
+            }
+
+            .admin-usuario-info span {
+                color: #778394;
+                font-size: 12px;
+            }
+
+        .admin-avatar {
+            width: 43px;
+            height: 43px;
+            border-radius: 50%;
+            background: var(--admin-azul);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 19px;
+            font-weight: bold;
+        }
+
+        /* =====================================
+                   CONTENIDO DE LAS VISTAS
+                ===================================== */
+
+        .admin-contenido {
+            padding: 30px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* =====================================
+                   PIE DE PÁGINA
+                ===================================== */
+
+        .admin-footer {
+            padding: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 13px;
+            border-top: 1px solid var(--admin-borde);
+        }
+
+        /* =====================================
+                   RESPONSIVE
+                ===================================== */
+
+        @@media (max-width: 991px) {
+
+            .admin-layout {
+                display: block;
+            }
+
+            .admin-sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .admin-logo {
+                padding: 15px;
+            }
+
+                .admin-logo img {
+                    width: 55px;
+                    height: 55px;
+                }
+
+            .admin-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                padding: 12px;
+            }
+
+            .admin-menu-titulo {
+                width: 100%;
+            }
+
+            .admin-menu a {
+                margin: 0;
+                font-size: 13px;
+            }
+
+            .admin-main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .admin-header {
+                padding: 18px;
+            }
+
+                .admin-header h1 {
+                    font-size: 18px;
+                }
+
+            .admin-contenido {
+                padding: 15px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+
+            .admin-header {
+                flex-wrap: wrap;
+            }
+
+            .admin-usuario {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .admin-menu a {
+                padding: 10px;
+            }
+        }
+
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
+
+</head>
+
+<body>
+
+    <div class="admin-layout">
+
+        <!-- =====================================
+             MENÚ LATERAL DEL ADMINISTRADOR
+        ===================================== -->
+
+        <aside class="admin-sidebar">
+
+            <!-- LOGO DEL RESTAURANTE -->
+
+            <div class="admin-logo">
+
+                <img src="~/images/logo-sabor-quisqueya.jpg"
+                     alt="Logo de Sabor a Quisqueya" />
+
+                <h2>Sabor a Quisqueya</h2>
+
+                <p>PANEL ADMINISTRATIVO</p>
+
+            </div>
+
+            <!-- NAVEGACIÓN -->
+
+            <nav class="admin-menu">
+
+                <div class="admin-menu-titulo">
+                    PRINCIPAL
+                </div>
+
+                <!-- DASHBOARD -->
+
+                <a asp-controller="Admin"
+                   asp-action="Index"
+                   class="@(controlador == "Admin" ? "activo" : "")">
+
+                    <span class="icono">📊</span>
+
+                    <span>Dashboard</span>
+
+                </a>
+
+                <!-- RESERVACIONES -->
+
+                <a asp-controller="Reservas"
+                   asp-action="Administrar"
+                   class="@(controlador == "Reservas" && accion == "Administrar" ? "activo" : "")">
+
+                    <span class="icono">📅</span>
+
+                    <span>Reservaciones</span>
+
+                </a>
+
+                <div class="admin-menu-titulo">
+                    ADMINISTRACIÓN
+                </div>
+
+                <!-- USUARIOS -->
+
+                <a asp-controller="Usuarios"
+                   asp-action="Index"
+                   class="@(controlador == "Usuarios" && accion == "Index" ? "activo" : "")">
+
+                    <span class="icono">👥</span>
+
+                    <span>Usuarios</span>
+
+                </a>
+
+                @*
+                    MÓDULOS PENDIENTES:
+
+                    - Mesas
+                    - Horarios
+                    - Menú
+                    - Configuración del restaurante
+
+                    Agregaremos sus enlaces cuando
+                    los controladores y las vistas
+                    estén implementados.
+                *@
+
+            </nav>
+
+            <!-- CERRAR SESIÓN -->
+
+            <div class="admin-salir">
+
+                <form asp-controller="Usuarios"
+                      asp-action="Logout"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit">
+                        🚪 Cerrar sesión
+                    </button>
+
+                </form>
+
+            </div>
+
+        </aside>
+
+        <!-- =====================================
+             CONTENIDO DEL ADMINISTRADOR
+        ===================================== -->
+
+        <div class="admin-main">
+
+            <!-- ENCABEZADO -->
+
+            <header class="admin-header">
+
+                <div>
+
+                    <h1>
+                        Administración del restaurante
+                    </h1>
+
+                    <div class="admin-header-subtitulo">
+                        Sistema de Gestión de Reservaciones
+                    </div>
+
+                </div>
+
+                <!-- ADMINISTRADOR CONECTADO -->
+
+                <div class="admin-usuario">
+
+                    <div class="admin-usuario-info">
+
+                        <strong>
+                            @nombreAdministrador
+                        </strong>
+
+                        <span>
+                            Administrador
+                        </span>
+
+                    </div>
+
+                    <div class="admin-avatar">
+                        @inicial
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- VISTA ACTUAL -->
+
+            <main class="admin-contenido">
+
+                @RenderBody()
+
+            </main>
+
+            <!-- PIE DE PÁGINA -->
+
+            <footer class="admin-footer">
+
+                © @DateTime.Now.Year - Sabor a Quisqueya |
+                Sistema de Gestión de Reservaciones
+
+            </footer>
+
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/js/site.js"
+            asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>
