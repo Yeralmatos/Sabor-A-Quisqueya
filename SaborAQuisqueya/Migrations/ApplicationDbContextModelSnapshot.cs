@@ -153,6 +153,37 @@ namespace SaborAQuisqueya.Migrations
                     b.ToTable("Platos");
                 });
 
+            modelBuilder.Entity("SaborAQuisqueya.Models.RecuperacionContrasena", b =>
+                {
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("BloqueadoHastaUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CodigoHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("ExpiraUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IntentosFallidos")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("ProximoEnvioUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UsuarioId");
+
+                    b.ToTable("RecuperacionesContrasena");
+                });
+
             modelBuilder.Entity("SaborAQuisqueya.Models.Reserva", b =>
                 {
                     b.Property<int>("Id")
@@ -333,6 +364,17 @@ namespace SaborAQuisqueya.Migrations
                     b.Navigation("CategoriaPlato");
 
                     b.Navigation("Restaurante");
+                });
+
+            modelBuilder.Entity("SaborAQuisqueya.Models.RecuperacionContrasena", b =>
+                {
+                    b.HasOne("SaborAQuisqueya.Models.Usuario", "Usuario")
+                        .WithOne()
+                        .HasForeignKey("SaborAQuisqueya.Models.RecuperacionContrasena", "UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("SaborAQuisqueya.Models.Reserva", b =>

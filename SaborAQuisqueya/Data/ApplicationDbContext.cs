@@ -15,6 +15,8 @@ namespace SaborAQuisqueya.Data
 
         public DbSet<Usuario> Usuarios { get; set; }
 
+        public DbSet<RecuperacionContrasena> RecuperacionesContrasena { get; set; }
+
         public DbSet<Restaurante> Restaurantes { get; set; }
 
         public DbSet<Horario> Horarios { get; set; }
@@ -38,6 +40,12 @@ namespace SaborAQuisqueya.Data
             modelBuilder.Entity<Usuario>()
                 .HasIndex(u => u.Correo)
                 .IsUnique();
+
+            modelBuilder.Entity<RecuperacionContrasena>()
+                .HasOne(r => r.Usuario)
+                .WithOne()
+                .HasForeignKey<RecuperacionContrasena>(r => r.UsuarioId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Evitar números de mesa duplicados
             modelBuilder.Entity<Mesa>()

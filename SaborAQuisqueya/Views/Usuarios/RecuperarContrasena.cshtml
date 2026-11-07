@@ -1,0 +1,57 @@
+@model SaborAQuisqueya.ViewModels.SolicitarRecuperacionViewModel
+@{
+    ViewData["Title"] = "Recuperar contraseña";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-shell">
+    <section class="auth-card">
+        <div class="auth-brand">
+            <img src="~/images/logo-sabor-quisqueya.jpg" alt="Logo de Sabor a Quisqueya" />
+            <span>Sabor a Quisqueya</span>
+        </div>
+
+        <p class="eyebrow">RECUPERA TU CUENTA</p>
+        <h1>¿Olvidaste tu contraseña?</h1>
+        <p class="muted">
+            Ingresa el correo de tu cuenta y te enviaremos un código de seis dígitos
+            para crear una nueva contraseña.
+        </p>
+
+        @if (TempData["Mensaje"] != null)
+        {
+            <div class="alert alert-info auth-message" role="status">@TempData["Mensaje"]</div>
+        }
+
+        <div asp-validation-summary="All" class="validation" role="alert"></div>
+
+        <form asp-controller="Usuarios" asp-action="RecuperarContrasena" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <label asp-for="Correo">
+                Correo electrónico
+                <input asp-for="Correo" type="email" class="form-control" required maxlength="150"
+                       autocomplete="email" placeholder="tu@correo.com" />
+            </label>
+            <button class="btn-sq" type="submit">Enviar código <span aria-hidden="true">→</span></button>
+        </form>
+
+        <p class="muted mt-3">El código vence en 10 minutos. Espera 60 segundos antes de solicitar otro.</p>
+        <p class="auth-footer">
+            ¿Ya recibiste un código?
+            <a asp-controller="Usuarios" asp-action="RestablecerContrasena">Usar mi código</a>
+        </p>
+        <p class="auth-footer"><a asp-controller="Usuarios" asp-action="Login">Volver a iniciar sesión</a></p>
+    </section>
+
+    <aside class="auth-art">
+        <img class="auth-logo" src="~/images/logo-sabor-quisqueya.jpg" alt="Sabor a Quisqueya" />
+        <div class="auth-art-copy">
+            <h2>Vuelve a disfrutar<br />del sabor de casa.</h2>
+            <p>Recupera el acceso y sigue planeando tus encuentros.</p>
+        </div>
+    </aside>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -42,7 +42,10 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-
+builder.Services.AddTransient<EmailService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddScoped<RecuperacionContrasenaService>();
 // ==========================================
 // 5. REGISTRAR SERVICIO DE CORREO
 // ==========================================
@@ -50,8 +53,11 @@ builder.Services.AddAuthorization();
 // Permite utilizar EmailService en los controladores.
 builder.Services.AddTransient<EmailService>();
 
+// Permite inyectar el servicio de recuperación de contraseña.
+builder.Services.AddScoped<RecuperacionContrasenaService>();
 
 var app = builder.Build();
+
 
 
 // ==========================================

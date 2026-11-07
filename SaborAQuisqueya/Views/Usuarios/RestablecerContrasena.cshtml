@@ -1,0 +1,70 @@
+@model SaborAQuisqueya.ViewModels.RestablecerContrasenaViewModel
+@{
+    ViewData["Title"] = "Crear nueva contraseña";
+    Layout = "_AuthLayout";
+}
+
+<div class="auth-shell">
+    <section class="auth-card">
+        <div class="auth-brand">
+            <img src="~/images/logo-sabor-quisqueya.jpg" alt="Logo de Sabor a Quisqueya" />
+            <span>Sabor a Quisqueya</span>
+        </div>
+
+        <p class="eyebrow">UN PASO MÁS</p>
+        <h1>Crea tu nueva contraseña</h1>
+        <p class="muted">Escribe el código que recibiste por correo y elige tu nueva contraseña.</p>
+
+        @if (TempData["Mensaje"] != null)
+        {
+            <div class="alert alert-info auth-message" role="status">@TempData["Mensaje"]</div>
+        }
+
+        <div asp-validation-summary="All" class="validation" role="alert"></div>
+
+        <form asp-controller="Usuarios" asp-action="RestablecerContrasena" method="post" class="form-stack">
+            @Html.AntiForgeryToken()
+            <label asp-for="Correo">
+                Correo electrónico
+                <input asp-for="Correo" type="email" class="form-control" required maxlength="150"
+                       autocomplete="email" placeholder="tu@correo.com" />
+            </label>
+            <label asp-for="Codigo">
+                Código de recuperación
+                <input asp-for="Codigo" type="text" class="form-control" required minlength="6" maxlength="6"
+                       inputmode="numeric" pattern="[0-9]{6}" autocomplete="one-time-code" placeholder="000000"
+                       aria-describedby="codigo-ayuda" />
+            </label>
+            <p id="codigo-ayuda" class="muted">El código dura 10 minutos y permite un máximo de cinco intentos.</p>
+            <label asp-for="NuevaContrasena">
+                Nueva contraseña
+                <input asp-for="NuevaContrasena" type="password" class="form-control" required minlength="8" maxlength="128"
+                       autocomplete="new-password" placeholder="Entre 8 y 128 caracteres" />
+            </label>
+            <label asp-for="ConfirmarContrasena">
+                Confirmar contraseña
+                <input asp-for="ConfirmarContrasena" type="password" class="form-control" required minlength="8" maxlength="128"
+                       autocomplete="new-password" placeholder="Repite tu nueva contraseña" />
+            </label>
+            <button class="btn-sq" type="submit">Guardar contraseña <span aria-hidden="true">→</span></button>
+        </form>
+
+        <p class="auth-footer">
+            ¿No recibiste el código o ya venció?
+            <a asp-controller="Usuarios" asp-action="RecuperarContrasena">Solicitar otro código</a>
+        </p>
+        <p class="auth-footer"><a asp-controller="Usuarios" asp-action="Login">Volver a iniciar sesión</a></p>
+    </section>
+
+    <aside class="auth-art">
+        <img class="auth-logo" src="~/images/logo-sabor-quisqueya.jpg" alt="Sabor a Quisqueya" />
+        <div class="auth-art-copy">
+            <h2>Tu próxima mesa<br />te está esperando.</h2>
+            <p>Elige una contraseña que no utilices en otros sitios.</p>
+        </div>
+    </aside>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

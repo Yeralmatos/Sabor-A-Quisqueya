@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using SaborAQuisqueya.Data;
 using SaborAQuisqueya.Models;
+using SaborAQuisqueya.Services;
+using SaborAQuisqueya.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -18,12 +21,87 @@ namespace SaborAQuisqueya.Controllers
         // ==============================================
 
         private readonly ApplicationDbContext _context;
+        private readonly RecuperacionContrasenaService _recuperacion;
 
         private readonly PasswordHasher<Usuario> _hasher = new();
 
-        public UsuariosController(ApplicationDbContext context)
+        public UsuariosController(
+            ApplicationDbContext context,
+            RecuperacionContrasenaService recuperacion)
         {
             _context = context;
+            _recuperacion = recuperacion;
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public IActionResult RecuperarContrasena()
+        {
+            return View(new SolicitarRecuperacionViewModel());
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("solicitar-recuperacion")]
+        public async Task<IActionResult> RecuperarContrasena(SolicitarRecuperacionViewModel modelo)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            string correo = modelo.Correo.Trim().ToLowerInvariant();
+            await _recuperacion.SolicitarCodigoAsync(correo);
+
+            // Mismo mensaje para cuentas inexistentes, inactivas y envíos limitados.
+            TempData["Mensaje"] = "Si el correo corresponde a una cuenta activa, recibirás un código. " +
+                "Revisa también la carpeta de spam. Para solicitar otro, espera al menos 60 segundos.";
+
+            // El correo se conserva en TempData para evitar exponerlo en la URL.
+            TempData["CorreoRecuperacion"] = correo;
+            return RedirectToAction(nameof(RestablecerContrasena));
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
+        public IActionResult RestablecerContrasena()
+        {
+            return View(new RestablecerContrasenaViewModel
+            {
+                Correo = TempData["CorreoRecuperacion"] as string ?? string.Empty
+            });
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        [EnableRateLimiting("restablecer-contrasena")]
+        public async Task<IActionResult> RestablecerContrasena(RestablecerContrasenaViewModel modelo)
+        {
+            Response.Headers.CacheControl = "no-store";
+            if (!ModelState.IsValid)
+            {
+                return View(modelo);
+            }
+
+            bool restablecida = await _recuperacion.RestablecerAsync(
+                modelo.Correo, modelo.Codigo, modelo.NuevaContrasena);
+
+            if (!restablecida)
+            {
+                ModelState.AddModelError(string.Empty,
+                    "El código no es válido, venció o se agotaron los intentos. " +
+                    "Comprueba el correo y el último código recibido. " +
+                    "Tras cinco intentos fallidos, espera 15 minutos antes de solicitar otro código.");
+                return View(modelo);
+            }
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["Mensaje"] = "Contraseña actualizada correctamente. Inicia sesión con tu nueva contraseña.";
+            return RedirectToAction(nameof(Login));
         }
 
         // ==============================================
@@ -269,6 +347,8 @@ namespace SaborAQuisqueya.Controllers
                     ClaimTypes.Email,
                     usuario.Correo
                 ),
+
+                new Claim(SesionUsuarioEvents.VersionClaim, SesionUsuarioEvents.ObtenerVersion(usuario)),
 
                 new Claim(
                     ClaimTypes.Role,
@@ -520,6 +600,8 @@ namespace SaborAQuisqueya.Controllers
                     ClaimTypes.Email,
                     usuario.Correo
                 ),
+
+                new Claim(SesionUsuarioEvents.VersionClaim, SesionUsuarioEvents.ObtenerVersion(usuario)),
 
                 new Claim(
                     ClaimTypes.Role,
