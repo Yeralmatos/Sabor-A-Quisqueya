@@ -4,7 +4,7 @@
     var controlador = ViewContext.RouteData.Values["controller"]?.ToString();
     var accion = ViewContext.RouteData.Values["action"]?.ToString();
 
-    var inicial = nombreAdministrador.Length > 0
+    var inicial = !string.IsNullOrWhiteSpace(nombreAdministrador)
         ? nombreAdministrador.Substring(0, 1).ToUpper()
         : "A";
 }
@@ -18,13 +18,11 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0" />
 
-    <title>@ViewData["Title"] - Administración | Sabor a Quisqueya</title>
+    <title>@ViewData["Title"] | Sabor a Quisqueya</title>
 
-    <!-- BOOTSTRAP -->
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 
-    <!-- ESTILOS DEL PROYECTO -->
     <link rel="stylesheet"
           href="~/css/site.css"
           asp-append-version="true" />
@@ -36,13 +34,17 @@
     <style>
 
         :root {
-            --admin-azul: #102b49;
-            --admin-azul-oscuro: #091d33;
-            --admin-rojo: #b83b32;
-            --admin-fondo: #f4f6f9;
-            --admin-texto: #243247;
+            --admin-vino: #4b0f17;
+            --admin-vino-oscuro: #310b11;
+            --admin-vino-claro: #84252b;
+            --admin-dorado: #c99b52;
+            --admin-dorado-claro: #e9c88d;
+            --admin-fondo: #f5f6fa;
             --admin-blanco: #ffffff;
-            --admin-borde: #e7ebef;
+            --admin-texto: #243047;
+            --admin-gris: #718096;
+            --admin-borde: #e8e9ee;
+            --admin-sidebar-ancho: 265px;
         }
 
         * {
@@ -53,7 +55,7 @@
             margin: 0;
             background: var(--admin-fondo);
             color: var(--admin-texto);
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
         }
 
         /* =====================================
@@ -70,77 +72,81 @@
                 ===================================== */
 
         .admin-sidebar {
-            width: 260px;
-            background: var(--admin-azul);
-            color: white;
+            width: var(--admin-sidebar-ancho);
+            background: linear-gradient( 180deg, var(--admin-vino) 0%, var(--admin-vino-oscuro) 100% );
             position: fixed;
             top: 0;
             left: 0;
             bottom: 0;
             display: flex;
             flex-direction: column;
+            color: white;
             z-index: 1000;
         }
 
         /* LOGO */
 
         .admin-logo {
-            padding: 25px 15px;
+            padding: 27px 20px 23px;
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,.12);
         }
 
             .admin-logo img {
-                width: 75px;
-                height: 75px;
-                object-fit: cover;
+                width: 76px;
+                height: 76px;
+                object-fit: contain;
                 border-radius: 50%;
-                margin-bottom: 12px;
+                background: white;
+                padding: 5px;
+                margin-bottom: 11px;
             }
 
             .admin-logo h2 {
-                font-size: 19px;
-                font-weight: bold;
+                font-size: 20px;
+                font-weight: 700;
                 color: white;
-                margin-bottom: 5px;
+                margin: 0 0 5px;
             }
 
             .admin-logo p {
-                font-size: 11px;
+                color: var(--admin-dorado-claro);
+                font-size: 10px;
                 letter-spacing: 2px;
-                color: #c9d5e2;
+                font-weight: 700;
                 margin: 0;
             }
 
         /* =====================================
-                   NAVEGACIÓN ADMINISTRATIVA
+                   NAVEGACIÓN
                 ===================================== */
 
         .admin-menu {
-            padding: 20px 12px;
+            padding: 20px 13px;
             flex: 1;
             overflow-y: auto;
         }
 
         .admin-menu-titulo {
-            color: #91a9c0;
-            font-size: 11px;
-            font-weight: bold;
-            letter-spacing: 1.5px;
-            padding: 12px 15px 8px;
+            font-size: 10px;
+            color: #d0b1b3;
+            letter-spacing: 1.6px;
+            font-weight: 700;
+            padding: 17px 14px 10px;
         }
 
         .admin-menu a {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 13px 15px;
-            margin-bottom: 6px;
-            color: #e5edf5;
+            gap: 13px;
+            color: #f0e6e7;
             text-decoration: none;
+            padding: 13px 15px;
+            margin-bottom: 5px;
             border-radius: 9px;
-            font-size: 15px;
-            transition: background .2s;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background .2s ease, color .2s ease;
         }
 
             .admin-menu a:hover {
@@ -149,40 +155,63 @@
             }
 
             .admin-menu a.activo {
-                background: rgba(255,255,255,.17);
+                background: var(--admin-dorado);
                 color: white;
-                font-weight: bold;
-                border-left: 3px solid #e1b36a;
+                font-weight: 700;
             }
 
         .admin-menu .icono {
-            width: 25px;
-            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 23px;
+            font-size: 17px;
             flex-shrink: 0;
         }
+
+        /* MÓDULOS PENDIENTES */
+
+        .admin-menu .modulo-pendiente {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 15px;
+            margin-bottom: 5px;
+            color: #bca4a8;
+            font-size: 14px;
+            opacity: .7;
+            cursor: default;
+        }
+
+            .admin-menu .modulo-pendiente .icono {
+                width: 23px;
+                text-align: center;
+            }
 
         /* =====================================
                    CERRAR SESIÓN
                 ===================================== */
 
         .admin-salir {
-            padding: 18px;
+            padding: 20px 15px;
             border-top: 1px solid rgba(255,255,255,.12);
         }
 
             .admin-salir button {
                 width: 100%;
-                background: var(--admin-rojo);
+                padding: 13px 16px;
+                background: #a52b32;
                 color: white;
-                border: none;
+                border: 1px solid rgba(255,255,255,.08);
                 border-radius: 9px;
-                padding: 12px;
-                font-weight: bold;
+                font-size: 14px;
+                font-weight: 700;
                 cursor: pointer;
+                transition: background .2s;
             }
 
                 .admin-salir button:hover {
-                    background: #992d27;
+                    background: #c0343c;
                 }
 
         /* =====================================
@@ -190,11 +219,12 @@
                 ===================================== */
 
         .admin-main {
-            margin-left: 260px;
-            width: calc(100% - 260px);
+            margin-left: var(--admin-sidebar-ancho);
+            width: calc(100% - var(--admin-sidebar-ancho));
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            min-width: 0;
         }
 
         /* =====================================
@@ -203,28 +233,28 @@
 
         .admin-header {
             background: white;
-            padding: 20px 30px;
+            padding: 19px 32px;
             border-bottom: 1px solid var(--admin-borde);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
+            gap: 20px;
         }
 
-            .admin-header h1 {
-                color: var(--admin-azul);
-                font-size: 22px;
-                font-weight: bold;
-                margin: 0;
-            }
+        .admin-header-izquierda h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--admin-vino);
+        }
 
         .admin-header-subtitulo {
-            color: #778394;
-            font-size: 13px;
-            margin-top: 5px;
+            font-size: 12px;
+            color: var(--admin-gris);
+            margin-top: 4px;
         }
 
-        /* USUARIO */
+        /* ADMINISTRADOR */
 
         .admin-usuario {
             display: flex;
@@ -239,24 +269,28 @@
             .admin-usuario-info strong {
                 display: block;
                 font-size: 14px;
+                font-weight: 700;
+                color: var(--admin-texto);
             }
 
             .admin-usuario-info span {
-                color: #778394;
+                display: block;
                 font-size: 12px;
+                color: var(--admin-gris);
+                margin-top: 2px;
             }
 
         .admin-avatar {
-            width: 43px;
             height: 43px;
+            width: 43px;
             border-radius: 50%;
-            background: var(--admin-azul);
-            color: white;
+            background: #f0e7e1;
+            color: var(--admin-vino);
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 19px;
-            font-weight: bold;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
         }
 
         /* =====================================
@@ -264,8 +298,9 @@
                 ===================================== */
 
         .admin-contenido {
-            padding: 30px;
             flex: 1;
+            width: 100%;
+            padding: 30px 34px;
             min-width: 0;
         }
 
@@ -274,11 +309,12 @@
                 ===================================== */
 
         .admin-footer {
-            padding: 20px;
-            text-align: center;
-            color: #777;
-            font-size: 13px;
+            background: white;
             border-top: 1px solid var(--admin-borde);
+            padding: 15px 20px;
+            color: var(--admin-gris);
+            font-size: 12px;
+            text-align: center;
         }
 
         /* =====================================
@@ -298,18 +334,18 @@
             }
 
             .admin-logo {
-                padding: 15px;
+                padding: 17px;
             }
 
                 .admin-logo img {
-                    width: 55px;
-                    height: 55px;
+                    width: 60px;
+                    height: 60px;
                 }
 
             .admin-menu {
                 display: flex;
                 flex-wrap: wrap;
-                gap: 6px;
+                gap: 5px;
                 padding: 12px;
             }
 
@@ -318,8 +354,15 @@
             }
 
             .admin-menu a {
-                margin: 0;
-                font-size: 13px;
+                margin-bottom: 0;
+            }
+
+            .admin-menu .modulo-pendiente {
+                display: none;
+            }
+
+            .admin-salir {
+                padding: 12px;
             }
 
             .admin-main {
@@ -328,22 +371,36 @@
             }
 
             .admin-header {
-                padding: 18px;
+                padding: 18px 22px;
             }
 
-                .admin-header h1 {
-                    font-size: 18px;
-                }
-
             .admin-contenido {
-                padding: 15px;
+                padding: 22px;
             }
         }
 
-        @@media (max-width: 480px) {
+        @@media (max-width: 576px) {
+
+            .admin-logo h2 {
+                font-size: 18px;
+            }
+
+            .admin-menu {
+                gap: 4px;
+            }
+
+                .admin-menu a {
+                    padding: 11px 12px;
+                    font-size: 13px;
+                }
 
             .admin-header {
+                padding: 15px;
                 flex-wrap: wrap;
+            }
+
+            .admin-header-izquierda h1 {
+                font-size: 17px;
             }
 
             .admin-usuario {
@@ -351,8 +408,8 @@
                 justify-content: flex-end;
             }
 
-            .admin-menu a {
-                padding: 10px;
+            .admin-contenido {
+                padding: 15px;
             }
         }
 
@@ -366,13 +423,11 @@
 
     <div class="admin-layout">
 
-        <!-- =====================================
-             MENÚ LATERAL DEL ADMINISTRADOR
-        ===================================== -->
+        <!-- MENÚ LATERAL -->
 
         <aside class="admin-sidebar">
 
-            <!-- LOGO DEL RESTAURANTE -->
+            <!-- LOGO -->
 
             <div class="admin-logo">
 
@@ -399,8 +454,7 @@
                    asp-action="Index"
                    class="@(controlador == "Admin" ? "activo" : "")">
 
-                    <span class="icono">📊</span>
-
+                    <span class="icono">⌂</span>
                     <span>Dashboard</span>
 
                 </a>
@@ -411,8 +465,7 @@
                    asp-action="Administrar"
                    class="@(controlador == "Reservas" && accion == "Administrar" ? "activo" : "")">
 
-                    <span class="icono">📅</span>
-
+                    <span class="icono">▦</span>
                     <span>Reservaciones</span>
 
                 </a>
@@ -421,30 +474,47 @@
                     ADMINISTRACIÓN
                 </div>
 
+                <!-- MESAS: BOTÓN FUNCIONAL -->
+
+                <a asp-controller="Mesas"
+                   asp-action="Index"
+                   class="@(controlador == "Mesas" ? "activo" : "")">
+
+                    <span class="icono">▤</span>
+                    <span>Mesas</span>
+
+                </a>
+
+                <!-- HORARIOS: PENDIENTE -->
+
+                <div class="modulo-pendiente"
+                     title="Módulo en desarrollo">
+
+                    <span class="icono">◷</span>
+                    <span>Horarios</span>
+
+                </div>
+
+                <!-- MENÚ: PENDIENTE -->
+
+                <div class="modulo-pendiente"
+                     title="Módulo en desarrollo">
+
+                    <span class="icono">☷</span>
+                    <span>Menú del restaurante</span>
+
+                </div>
+
                 <!-- USUARIOS -->
 
                 <a asp-controller="Usuarios"
                    asp-action="Index"
                    class="@(controlador == "Usuarios" && accion == "Index" ? "activo" : "")">
 
-                    <span class="icono">👥</span>
-
+                    <span class="icono">♟</span>
                     <span>Usuarios</span>
 
                 </a>
-
-                @*
-                    MÓDULOS PENDIENTES:
-
-                    - Mesas
-                    - Horarios
-                    - Menú
-                    - Configuración del restaurante
-
-                    Agregaremos sus enlaces cuando
-                    los controladores y las vistas
-                    estén implementados.
-                *@
 
             </nav>
 
@@ -459,7 +529,7 @@
                     @Html.AntiForgeryToken()
 
                     <button type="submit">
-                        🚪 Cerrar sesión
+                        ↪ &nbsp; Cerrar sesión
                     </button>
 
                 </form>
@@ -468,20 +538,18 @@
 
         </aside>
 
-        <!-- =====================================
-             CONTENIDO DEL ADMINISTRADOR
-        ===================================== -->
+        <!-- ÁREA PRINCIPAL -->
 
         <div class="admin-main">
 
-            <!-- ENCABEZADO -->
+            <!-- ENCABEZADO SUPERIOR -->
 
             <header class="admin-header">
 
-                <div>
+                <div class="admin-header-izquierda">
 
                     <h1>
-                        Administración del restaurante
+                        Administración del Restaurante
                     </h1>
 
                     <div class="admin-header-subtitulo">
@@ -514,7 +582,7 @@
 
             </header>
 
-            <!-- VISTA ACTUAL -->
+            <!-- CONTENIDO DE CADA VISTA -->
 
             <main class="admin-contenido">
 

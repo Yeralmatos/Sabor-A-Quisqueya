@@ -4,170 +4,808 @@
     ViewData["Title"] = "Dashboard Administrativo";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 
-    var totalReservas = (int)ViewBag.TotalReservas;
-    var pendientes = (int)ViewBag.ReservasPendientes;
-    var aceptadas = (int)ViewBag.ReservasAceptadas;
-    var rechazadas = (int)ViewBag.ReservasRechazadas;
-    var canceladas = (int)ViewBag.ReservasCanceladas;
-    var totalMesas = (int)ViewBag.TotalMesas;
-    var totalClientes = (int)ViewBag.TotalClientes;
+    // Estadísticas provenientes de AdminController
+    var totalReservas = (int)(ViewBag.TotalReservas ?? 0);
+    var pendientes = (int)(ViewBag.ReservasPendientes ?? 0);
+    var aceptadas = (int)(ViewBag.ReservasAceptadas ?? 0);
+    var rechazadas = (int)(ViewBag.ReservasRechazadas ?? 0);
+    var canceladas = (int)(ViewBag.ReservasCanceladas ?? 0);
+    var totalMesas = (int)(ViewBag.TotalMesas ?? 0);
+    var totalClientes = (int)(ViewBag.TotalClientes ?? 0);
+
+    var nombreAdministrador = User.Identity?.Name ?? "Administrador";
 }
 
-<div class="page-wrap">
+<style>
 
-    <!-- ENCABEZADO -->
-    <div class="page-heading">
+    /* =========================================
+           DASHBOARD - SABOR A QUISQUEYA
+        ========================================= */
+
+    .sq-dashboard {
+        width: 100%;
+        max-width: none;
+        margin: 0 auto;
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #292d38;
+    }
+
+    /* =========================================
+           BANNER DE BIENVENIDA
+        ========================================= */
+
+    .sq-bienvenida {
+        position: relative;
+        min-height: 230px;
+        background: linear-gradient( 90deg, rgba(49, 11, 17, .96) 0%, rgba(75, 15, 23, .88) 40%, rgba(49, 11, 17, .20) 100% ), url('/images/fachada-restaurante.png');
+        background-position: center;
+        background-size: cover;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        padding: 35px 45px;
+        overflow: hidden;
+        margin-bottom: 25px;
+    }
+
+    .sq-bienvenida-contenido {
+        position: relative;
+        z-index: 2;
+        max-width: 650px;
+    }
+
+    .sq-etiqueta {
+        display: inline-block;
+        color: #eccd91;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 12px;
+    }
+
+    .sq-bienvenida h1 {
+        color: #ffffff;
+        font-size: clamp(28px, 3vw, 40px);
+        font-weight: 750;
+        line-height: 1.2;
+        margin: 0 0 12px;
+    }
+
+        .sq-bienvenida h1 span {
+            color: #e4b76b;
+        }
+
+    .sq-bienvenida p {
+        color: #f3e8e5;
+        font-size: 15px;
+        line-height: 1.8;
+        max-width: 560px;
+        margin: 0;
+    }
+
+    /* =========================================
+           ENCABEZADOS DE SECCIONES
+        ========================================= */
+
+    .sq-seccion-titulo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 18px;
+    }
+
+        .sq-seccion-titulo h2 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 750;
+            color: #2d2630;
+        }
+
+        .sq-seccion-titulo p {
+            margin: 5px 0 0;
+            color: #85808a;
+            font-size: 13px;
+        }
+
+    .sq-seccion-enlace {
+        color: #882932;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+        .sq-seccion-enlace:hover {
+            color: #55151d;
+            text-decoration: underline;
+        }
+
+    /* =========================================
+           ESTADÍSTICAS
+        ========================================= */
+
+    .sq-estadisticas {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .sq-estadistica {
+        background: #ffffff;
+        border: 1px solid #ebe7e7;
+        border-radius: 14px;
+        padding: 22px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        min-width: 0;
+        min-height: 118px;
+        box-shadow: 0 5px 18px rgba(31, 28, 40, .035);
+        transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+        .sq-estadistica:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(31, 28, 40, .075);
+        }
+
+    .sq-estadistica-icono {
+        width: 55px;
+        height: 55px;
+        min-width: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-size: 25px;
+    }
+
+    .sq-estadistica-info {
+        min-width: 0;
+    }
+
+        .sq-estadistica-info p {
+            color: #77717b;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 0 0 6px;
+            line-height: 1.4;
+        }
+
+        .sq-estadistica-info h3 {
+            color: #29242b;
+            font-size: 29px;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1;
+        }
+
+        .sq-estadistica-info small {
+            display: block;
+            color: #96909a;
+            font-size: 11px;
+            margin-top: 7px;
+            line-height: 1.4;
+        }
+
+    /* COLORES DE LAS TARJETAS */
+
+    .sq-icono-vino {
+        background: #fae9e9;
+        color: #a82f36;
+    }
+
+    .sq-icono-amarillo {
+        background: #fff3da;
+        color: #d58a00;
+    }
+
+    .sq-icono-verde {
+        background: #e5f5eb;
+        color: #168247;
+    }
+
+    .sq-icono-rojo {
+        background: #ffe7e7;
+        color: #d43a3f;
+    }
+
+    .sq-icono-azul {
+        background: #e8f1fd;
+        color: #2b76c6;
+    }
+
+    .sq-icono-morado {
+        background: #f0eafd;
+        color: #7741b8;
+    }
+
+    .sq-icono-gris {
+        background: #edf0f4;
+        color: #64748b;
+    }
+
+    /* =========================================
+           SEGUNDA FILA DE ESTADÍSTICAS
+        ========================================= */
+
+    .sq-estadisticas-secundarias {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 28px;
+    }
+
+    /* =========================================
+           CONTENEDORES GENERALES
+        ========================================= */
+
+    .sq-panel {
+        background: #ffffff;
+        border: 1px solid #ebe7e7;
+        border-radius: 15px;
+        padding: 24px;
+        box-shadow: 0 5px 18px rgba(31, 28, 40, .035);
+        min-width: 0;
+    }
+
+    /* =========================================
+           ACCESOS RÁPIDOS
+        ========================================= */
+
+    .sq-accesos {
+        margin-bottom: 25px;
+    }
+
+    .sq-accesos-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .sq-acceso {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        min-height: 53px;
+        padding: 13px 18px;
+        border-radius: 9px;
+        color: white !important;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none !important;
+        transition: filter .2s ease, transform .2s ease;
+    }
+
+        .sq-acceso:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+        }
+
+        .sq-acceso span {
+            font-size: 19px;
+        }
+
+    .sq-acceso-reservas {
+        background: #892630;
+    }
+
+    .sq-acceso-usuarios {
+        background: #244b79;
+    }
+
+    /* =========================================
+           TABLA DE RESERVACIONES
+        ========================================= */
+
+    .sq-tabla-contenedor {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .sq-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 690px;
+    }
+
+        .sq-tabla thead {
+            background: #f8f3ed;
+        }
+
+        .sq-tabla th {
+            padding: 15px;
+            color: #635457;
+            font-size: 11px;
+            font-weight: 750;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            white-space: nowrap;
+            border-bottom: 1px solid #eaded2;
+        }
+
+        .sq-tabla td {
+            padding: 17px 15px;
+            font-size: 13px;
+            color: #39333a;
+            border-bottom: 1px solid #f0ecea;
+            vertical-align: middle;
+        }
+
+        .sq-tabla tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .sq-tabla tbody tr:hover {
+            background: #fcfaf8;
+        }
+
+    .sq-cliente {
+        font-weight: 700;
+        color: #2a2933;
+    }
+
+    .sq-estado {
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .sq-estado-aceptada {
+        background: #e4f4e9;
+        color: #18743d;
+    }
+
+    .sq-estado-pendiente {
+        background: #fff0d3;
+        color: #a46600;
+    }
+
+    /* =========================================
+           SIN RESERVACIONES
+        ========================================= */
+
+    .sq-vacio {
+        text-align: center;
+        padding: 35px 20px;
+    }
+
+    .sq-vacio-icono {
+        font-size: 38px;
+        margin-bottom: 12px;
+        color: #b79a70;
+    }
+
+    .sq-vacio h3 {
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #433b40;
+    }
+
+    .sq-vacio p {
+        color: #88818a;
+        font-size: 13px;
+        margin: 0;
+    }
+
+    /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+    @@media (max-width: 1200px) {
+
+        .sq-estadisticas {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 767px) {
+
+        .sq-bienvenida {
+            min-height: 210px;
+            padding: 28px;
+        }
+
+            .sq-bienvenida h1 {
+                font-size: 29px;
+            }
+
+        .sq-estadisticas,
+        .sq-estadisticas-secundarias {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .sq-accesos-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sq-panel {
+            padding: 18px;
+        }
+    }
+
+    @@media (max-width: 480px) {
+
+        .sq-bienvenida {
+            padding: 23px;
+        }
+
+            .sq-bienvenida h1 {
+                font-size: 26px;
+            }
+
+        .sq-estadisticas,
+        .sq-estadisticas-secundarias {
+            grid-template-columns: 1fr;
+        }
+
+        .sq-estadistica {
+            min-height: 95px;
+        }
+
+        .sq-seccion-titulo {
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+
+</style>
+
+
+<div class="sq-dashboard">
+
+    <!-- =====================================
+         BIENVENIDA
+    ===================================== -->
+
+    <section class="sq-bienvenida">
+
+        <div class="sq-bienvenida-contenido">
+
+            <span class="sq-etiqueta">
+                SABOR A QUISQUEYA / ADMINISTRACIÓN
+            </span>
+
+            <h1>
+                Bienvenido al<br />
+                <span>Panel Administrativo</span>
+            </h1>
+
+            <p>
+                Gestiona las reservaciones, supervisa las mesas
+                y administra la información de nuestro restaurante
+                desde un solo lugar.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         TÍTULO DE ESTADÍSTICAS
+    ===================================== -->
+
+    <div class="sq-seccion-titulo">
+
         <div>
-            <p class="eyebrow">PANEL ADMINISTRATIVO</p>
+            <h2>Resumen general</h2>
 
-            <h1>Dashboard</h1>
-
-            <p class="muted">
-                Bienvenido al sistema de administración de Sabor a Quisqueya.
-                Consulta las estadísticas y supervisa las reservaciones.
+            <p>
+                Estado actual de las reservaciones
+                de Sabor a Quisqueya.
             </p>
         </div>
 
-        <div class="heading-icon">📊</div>
     </div>
 
-    <!-- ESTADÍSTICAS DE RESERVACIONES -->
-    <div class="row g-3 mb-4">
 
-        <div class="col-lg-3 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Total de reservaciones</p>
-                <h2 class="fw-bold">@totalReservas</h2>
-                <small class="text-muted">Reservaciones registradas</small>
+    <!-- =====================================
+         ESTADÍSTICAS PRINCIPALES
+    ===================================== -->
+
+    <section class="sq-estadisticas">
+
+        <!-- TOTAL DE RESERVACIONES -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-vino">
+                ▦
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Total de reservaciones</p>
+
+                <h3>@totalReservas</h3>
+
+                <small>Registradas en el sistema</small>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Pendientes</p>
-                <h2 class="fw-bold text-warning">@pendientes</h2>
-                <small class="text-muted">Esperando aprobación</small>
+
+        <!-- PENDIENTES -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-amarillo">
+                ◷
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Pendientes</p>
+
+                <h3>@pendientes</h3>
+
+                <small>Esperando aprobación</small>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Aceptadas</p>
-                <h2 class="fw-bold text-success">@aceptadas</h2>
-                <small class="text-muted">Reservaciones confirmadas</small>
+
+        <!-- ACEPTADAS -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-verde">
+                ✓
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Aceptadas</p>
+
+                <h3>@aceptadas</h3>
+
+                <small>Reservaciones confirmadas</small>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-3 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Rechazadas</p>
-                <h2 class="fw-bold text-danger">@rechazadas</h2>
-                <small class="text-muted">Solicitudes rechazadas</small>
+
+        <!-- RECHAZADAS -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-rojo">
+                ✕
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Rechazadas</p>
+
+                <h3>@rechazadas</h3>
+
+                <small>Solicitudes rechazadas</small>
+
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
-    <!-- INFORMACIÓN ADICIONAL -->
-    <div class="row g-3 mb-4">
 
-        <div class="col-lg-4 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Reservaciones canceladas</p>
-                <h2 class="fw-bold">@canceladas</h2>
+    <!-- =====================================
+         ESTADÍSTICAS SECUNDARIAS
+    ===================================== -->
+
+    <section class="sq-estadisticas-secundarias">
+
+        <!-- MESAS ACTIVAS -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-azul">
+                ▤
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Mesas activas</p>
+
+                <h3>@totalMesas</h3>
+
+                <small>Mesas habilitadas</small>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-4 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Mesas activas</p>
-                <h2 class="fw-bold">@totalMesas</h2>
+
+        <!-- CLIENTES REGISTRADOS -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-morado">
+                ♙
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Clientes registrados</p>
+
+                <h3>@totalClientes</h3>
+
+                <small>Usuarios con rol Cliente</small>
+
+            </div>
+
         </div>
 
-        <div class="col-lg-4 col-md-6">
-            <div class="panel p-4 h-100">
-                <p class="muted mb-2">Clientes registrados</p>
-                <h2 class="fw-bold">@totalClientes</h2>
+
+        <!-- CANCELADAS -->
+
+        <div class="sq-estadistica">
+
+            <div class="sq-estadistica-icono sq-icono-gris">
+                ⊗
             </div>
+
+            <div class="sq-estadistica-info">
+
+                <p>Reservaciones canceladas</p>
+
+                <h3>@canceladas</h3>
+
+                <small>Reservaciones canceladas</small>
+
+            </div>
+
         </div>
 
-    </div>
+    </section>
 
-    <!-- ACCESOS RÁPIDOS -->
-    <section class="panel p-4 mb-4">
 
-        <h2 class="h4 fw-bold mb-3">Accesos rápidos</h2>
+    <!-- =====================================
+         ACCESOS RÁPIDOS
+    ===================================== -->
 
-        <div class="d-flex flex-wrap gap-3">
+    <section class="sq-panel sq-accesos">
+
+        <div class="sq-seccion-titulo">
+
+            <div>
+                <h2>Accesos rápidos</h2>
+
+                <p>
+                    Accede a las principales funciones
+                    de administración.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="sq-accesos-grid">
+
+            <!-- GESTIONAR RESERVACIONES -->
 
             <a asp-controller="Reservas"
                asp-action="Administrar"
-               class="btn btn-primary">
-                📅 Gestionar reservaciones
+               class="sq-acceso sq-acceso-reservas">
+
+                <span>▦</span>
+
+                Gestionar reservaciones
+
             </a>
+
+
+            <!-- GESTIONAR USUARIOS -->
 
             <a asp-controller="Usuarios"
                asp-action="Index"
-               class="btn btn-outline-primary">
-                👥 Administrar usuarios
+               class="sq-acceso sq-acceso-usuarios">
+
+                <span>♙</span>
+
+                Administrar usuarios
+
             </a>
 
         </div>
 
     </section>
 
-    <!-- PRÓXIMAS RESERVACIONES -->
-    <section class="panel table-panel">
 
-        <div class="panel-title">
+    <!-- =====================================
+         PRÓXIMAS RESERVACIONES
+    ===================================== -->
+
+    <section class="sq-panel">
+
+        <div class="sq-seccion-titulo">
+
             <div>
+
                 <h2>Próximas reservaciones</h2>
-                <p>Solicitudes pendientes y aceptadas.</p>
+
+                <p>
+                    Solicitudes pendientes y aceptadas
+                    que están próximas a realizarse.
+                </p>
+
             </div>
+
+            <a asp-controller="Reservas"
+               asp-action="Administrar"
+               class="sq-seccion-enlace">
+
+                Ver todas →
+
+            </a>
+
         </div>
 
-        <div class="table-responsive">
 
-            <table class="table align-middle">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="sq-vacio">
 
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Mesa</th>
-                        <th>Fecha</th>
-                        <th>Hora</th>
-                        <th>Personas</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
+                <div class="sq-vacio-icono">
+                    ▦
+                </div>
 
-                <tbody>
+                <h3>
+                    No hay próximas reservaciones
+                </h3>
 
-                    @if (!Model.Any())
-                    {
+                <p>
+                    Las nuevas solicitudes aparecerán aquí
+                    cuando los clientes realicen sus reservaciones.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="sq-tabla-contenedor">
+
+                <table class="sq-tabla">
+
+                    <thead>
                         <tr>
-                            <td colspan="6" class="text-center py-4">
-                                <p class="muted mb-0">
-                                    No existen próximas reservaciones.
-                                </p>
-                            </td>
+                            <th>Cliente</th>
+                            <th>Mesa</th>
+                            <th>Fecha</th>
+                            <th>Hora</th>
+                            <th>Personas</th>
+                            <th>Estado</th>
                         </tr>
-                    }
-                    else
-                    {
+                    </thead>
+
+                    <tbody>
+
                         @foreach (var reserva in Model)
                         {
-                            var estadoClase = reserva.Estado == "Aceptada"
-                            ? "status-green"
-                            : "status-amber";
+                            var claseEstado = reserva.Estado == "Aceptada"
+                            ? "sq-estado-aceptada"
+                            : "sq-estado-pendiente";
 
                             <tr>
+
+                                <!-- CLIENTE -->
+
                                 <td>
-                                    <strong>
+                                    <span class="sq-cliente">
                                         @(reserva.Usuario?.Nombre ?? "Cliente")
-                                    </strong>
+                                    </span>
                                 </td>
+
+                                <!-- MESA -->
 
                                 <td>
                                     @(reserva.Mesa != null
@@ -175,9 +813,13 @@
                                                                 : "Sin asignar")
                                                                             </td>
 
+                                <!-- FECHA -->
+
                                 <td>
                                     @reserva.FechaReserva.ToString("dd/MM/yyyy")
                                 </td>
+
+                                <!-- HORA -->
 
                                 <td>
                                     @(DateTime.Today
@@ -185,22 +827,29 @@
                                                                 .ToString("hh:mm tt"))
                         </td>
 
-                                <td>@reserva.CantidadPersonas</td>
+                                <!-- PERSONAS -->
 
                                 <td>
-                                    <span class="status @estadoClase">
+                                    @reserva.CantidadPersonas
+                                </td>
+
+                                <!-- ESTADO -->
+
+                                <td>
+                                    <span class="sq-estado @claseEstado">
                                         @reserva.Estado
                                     </span>
                                 </td>
+
                             </tr>
                                         }
-                    }
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
 
-        </div>
+            </div>
+        }
 
     </section>
 

@@ -1,0 +1,539 @@
+﻿@model IEnumerable<SaborAQuisqueya.Models.Mesa>
+
+@{
+    ViewData["Title"] = "Gestión de Mesas";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var mesas = Model.ToList();
+
+    var totalMesas = mesas.Count;
+    var mesasActivas = mesas.Count(m => m.Activa);
+    var mesasInactivas = mesas.Count(m => !m.Activa);
+    var capacidadTotal = mesas.Where(m => m.Activa).Sum(m => m.Capacidad);
+}
+
+<style>
+    .mesas-page {
+        width: 100%;
+        color: #302a30;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    .mesas-heading {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 26px;
+    }
+
+    .mesas-eyebrow {
+        margin: 0 0 7px;
+        color: #9d6b47;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .mesas-heading h1 {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 750;
+        color: #46151d;
+    }
+
+    .mesas-subtitle {
+        margin: 8px 0 0;
+        font-size: 14px;
+        color: #77717a;
+    }
+
+    .mesas-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 11px 18px;
+        border: 0;
+        border-radius: 9px;
+        font-weight: 650;
+        font-size: 13px;
+        text-decoration: none;
+        cursor: pointer;
+        transition: background .2s ease, transform .2s ease;
+    }
+
+        .mesas-btn:hover {
+            transform: translateY(-1px);
+        }
+
+    .mesas-btn-primary {
+        background: #872832;
+        color: #fff;
+    }
+
+        .mesas-btn-primary:hover {
+            background: #6b1c25;
+            color: #fff;
+        }
+
+    .mesas-btn-outline {
+        background: #fff;
+        border: 1px solid #ded4d6;
+        color: #63202a;
+    }
+
+        .mesas-btn-outline:hover {
+            background: #faf5f5;
+        }
+
+    .mesas-btn-warning {
+        background: #fff2d6;
+        color: #825100;
+    }
+
+    .mesas-btn-success {
+        background: #e5f3e8;
+        color: #19653a;
+    }
+
+    .mesas-stats {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 25px;
+    }
+
+    .mesas-stat {
+        background: #fff;
+        border: 1px solid #eae5e5;
+        border-radius: 13px;
+        padding: 22px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        min-width: 0;
+    }
+
+    .mesas-stat-icon {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        background: #f6e7e7;
+        color: #892832;
+        font-size: 22px;
+    }
+
+    .mesas-stat:nth-child(2) .mesas-stat-icon {
+        background: #e6f3e9;
+        color: #23764a;
+    }
+
+    .mesas-stat:nth-child(3) .mesas-stat-icon {
+        background: #f0edf3;
+        color: #71627e;
+    }
+
+    .mesas-stat:nth-child(4) .mesas-stat-icon {
+        background: #fff2dd;
+        color: #a3701c;
+    }
+
+    .mesas-stat-label {
+        color: #817984;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+
+    .mesas-stat-value {
+        font-size: 29px;
+        line-height: 1;
+        font-weight: 800;
+        color: #342630;
+    }
+
+    .mesas-panel {
+        background: #fff;
+        border: 1px solid #eae5e5;
+        border-radius: 14px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .mesas-panel-title {
+        font-size: 18px;
+        font-weight: 750;
+        color: #421923;
+        margin: 0 0 5px;
+    }
+
+    .mesas-panel-desc {
+        margin: 0 0 20px;
+        font-size: 13px;
+        color: #817984;
+    }
+
+    .mesas-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: 14px;
+        align-items: end;
+    }
+
+    .mesas-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 650;
+        margin-bottom: 7px;
+        color: #493b43;
+    }
+
+    .mesas-field input {
+        width: 100%;
+        border: 1px solid #dcd9dc;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 14px;
+        min-height: 43px;
+        background: #fff;
+    }
+
+        .mesas-field input:focus {
+            border-color: #9e4852;
+            outline: 3px solid rgba(158, 72, 82, .13);
+        }
+
+    .mesas-form .mesas-btn {
+        min-height: 43px;
+    }
+
+    .mesas-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+    }
+
+    .mesa-card {
+        background: #fff;
+        border: 1px solid #eae5e5;
+        border-radius: 13px;
+        padding: 20px;
+        min-width: 0;
+    }
+
+        .mesa-card.inactiva {
+            background: #faf9f9;
+            opacity: .83;
+        }
+
+    .mesa-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .mesa-numero {
+        font-size: 18px;
+        font-weight: 750;
+        color: #451922;
+    }
+
+    .mesa-badge {
+        border-radius: 20px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+    }
+
+        .mesa-badge.activa {
+            background: #e5f3e9;
+            color: #207244;
+        }
+
+        .mesa-badge.inactiva {
+            background: #ededf0;
+            color: #68656b;
+        }
+
+    .mesa-capacidad {
+        color: #635b64;
+        font-size: 13px;
+        margin-bottom: 17px;
+    }
+
+    .mesa-card-form {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+        .mesa-card-form .mesas-field input {
+            padding: 9px 10px;
+            min-height: 40px;
+        }
+
+    .mesa-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 13px;
+    }
+
+        .mesa-card-actions .mesas-btn {
+            flex: 1;
+            padding: 10px 11px;
+            font-size: 12px;
+        }
+
+    .mesas-alerta {
+        background: #fff8e7;
+        color: #79531c;
+        border: 1px solid #f2dfa9;
+        padding: 13px 16px;
+        border-radius: 9px;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .mesas-vacio {
+        text-align: center;
+        padding: 40px 15px;
+        color: #817984;
+    }
+
+    @@media (max-width: 1150px) {
+        .mesas-stats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .mesas-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .mesas-form {
+            grid-template-columns: 1fr;
+        }
+
+        .mesas-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .mesas-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .mesas-panel {
+            padding: 18px;
+        }
+    }
+</style>
+
+<div class="mesas-page">
+
+    <header class="mesas-heading">
+        <div>
+            <p class="mesas-eyebrow">SABOR A QUISQUEYA / ADMINISTRACIÓN</p>
+            <h1>Gestión de mesas</h1>
+            <p class="mesas-subtitle">
+                Administra las mesas y sus capacidades desde el panel.
+            </p>
+        </div>
+    </header>
+
+    @if (TempData["Mensaje"] != null)
+    {
+        <div class="mesas-alerta" role="alert">
+            @TempData["Mensaje"]
+        </div>
+    }
+
+    <section class="mesas-stats" aria-label="Resumen de mesas">
+        <div class="mesas-stat">
+            <div class="mesas-stat-icon">▦</div>
+            <div>
+                <div class="mesas-stat-label">Total de mesas</div>
+                <div class="mesas-stat-value">@totalMesas</div>
+            </div>
+        </div>
+
+        <div class="mesas-stat">
+            <div class="mesas-stat-icon">✓</div>
+            <div>
+                <div class="mesas-stat-label">Mesas activas</div>
+                <div class="mesas-stat-value">@mesasActivas</div>
+            </div>
+        </div>
+
+        <div class="mesas-stat">
+            <div class="mesas-stat-icon">⊘</div>
+            <div>
+                <div class="mesas-stat-label">Mesas inactivas</div>
+                <div class="mesas-stat-value">@mesasInactivas</div>
+            </div>
+        </div>
+
+        <div class="mesas-stat">
+            <div class="mesas-stat-icon">♙</div>
+            <div>
+                <div class="mesas-stat-label">Capacidad activa</div>
+                <div class="mesas-stat-value">@capacidadTotal</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mesas-panel">
+        <h2 class="mesas-panel-title">Agregar nueva mesa</h2>
+        <p class="mesas-panel-desc">
+            Registra una mesa para Sabor a Quisqueya. La capacidad máxima es de 8 personas.
+        </p>
+
+        <form asp-controller="Mesas"
+              asp-action="Crear"
+              method="post"
+              class="mesas-form">
+
+            @Html.AntiForgeryToken()
+
+            <div class="mesas-field">
+                <label for="mesaNuevaNumero">Número de mesa</label>
+                <input id="mesaNuevaNumero"
+                       name="numero"
+                       type="number"
+                       min="1"
+                       max="1000"
+                       required
+                       placeholder="Ej. 11" />
+            </div>
+
+            <div class="mesas-field">
+                <label for="mesaNuevaCapacidad">Capacidad</label>
+                <input id="mesaNuevaCapacidad"
+                       name="capacidad"
+                       type="number"
+                       min="1"
+                       max="8"
+                       value="8"
+                       required />
+            </div>
+
+            <button type="submit" class="mesas-btn mesas-btn-primary">
+                + Agregar mesa
+            </button>
+        </form>
+    </section>
+
+    <section class="mesas-panel">
+        <h2 class="mesas-panel-title">Mesas del restaurante</h2>
+        <p class="mesas-panel-desc">
+            Modifica sus datos o activa y desactiva mesas cuando sea necesario.
+        </p>
+
+        @if (!mesas.Any())
+        {
+            <div class="mesas-vacio">
+                No hay mesas registradas. Agrega la primera mesa desde el formulario.
+            </div>
+        }
+        else
+        {
+            <div class="mesas-grid">
+
+                @foreach (var mesa in mesas)
+                {
+                    <article class="mesa-card @(!mesa.Activa ? "inactiva" : "")">
+
+                        <div class="mesa-card-head">
+                            <div class="mesa-numero">Mesa @mesa.Numero</div>
+
+                            @if (mesa.Activa)
+                            {
+                                <span class="mesa-badge activa">Activa</span>
+                            }
+                            else
+                            {
+                                <span class="mesa-badge inactiva">Inactiva</span>
+                            }
+                        </div>
+
+                        <div class="mesa-capacidad">
+                            Capacidad: <strong>@mesa.Capacidad personas</strong>
+                        </div>
+
+                        <form asp-controller="Mesas"
+                              asp-action="Editar"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="id" value="@mesa.Id" />
+
+                            <div class="mesa-card-form">
+                                <div class="mesas-field">
+                                    <label for="numero-@mesa.Id">Número</label>
+                                    <input id="numero-@mesa.Id"
+                                           name="numero"
+                                           type="number"
+                                           min="1"
+                                           max="1000"
+                                           value="@mesa.Numero"
+                                           required />
+                                </div>
+
+                                <div class="mesas-field">
+                                    <label for="capacidad-@mesa.Id">Capacidad</label>
+                                    <input id="capacidad-@mesa.Id"
+                                           name="capacidad"
+                                           type="number"
+                                           min="1"
+                                           max="8"
+                                           value="@mesa.Capacidad"
+                                           required />
+                                </div>
+                            </div>
+
+                            <div class="mesa-card-actions">
+                                <button type="submit"
+                                        class="mesas-btn mesas-btn-outline">
+                                    Guardar cambios
+                                </button>
+                            </div>
+                        </form>
+
+                        <form asp-controller="Mesas"
+                              asp-action="CambiarEstado"
+                              method="post"
+                              class="mt-2">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" name="id" value="@mesa.Id" />
+
+                            <button type="submit"
+                                    class="mesas-btn @(mesa.Activa ? "mesas-btn-warning" : "mesas-btn-success") w-100"
+                                    onclick="return confirm('@(mesa.Activa ? "¿Deseas desactivar esta mesa?" : "¿Deseas activar esta mesa?")')">
+
+                                @(mesa.Activa ? "Desactivar mesa" : "Activar mesa")
+
+                            </button>
+                        </form>
+
+                    </article>
+                }
+
+            </div>
+        }
+    </section>
+</div>
